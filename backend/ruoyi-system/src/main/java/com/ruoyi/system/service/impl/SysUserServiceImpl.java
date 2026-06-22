@@ -118,6 +118,18 @@ public class SysUserServiceImpl implements ISysUserService
     }
 
     /**
+     * 通过RFID查询用户
+     *
+     * @param rfidCard RFID卡号
+     * @return 用户对象信息
+     */
+    @Override
+    public SysUser selectUserByRfidCard(String rfidCard)
+    {
+        return userMapper.selectUserByRfidCard(rfidCard);
+    }
+
+    /**
      * 通过用户ID查询用户
      * 
      * @param userId 用户ID
@@ -210,6 +222,28 @@ public class SysUserServiceImpl implements ISysUserService
     {
         Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
         SysUser info = userMapper.checkEmailUnique(user.getEmail());
+        if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
+        {
+            return UserConstants.NOT_UNIQUE;
+        }
+        return UserConstants.UNIQUE;
+    }
+
+    /**
+     * 校验RFID是否唯一
+     *
+     * @param user 用户信息
+     * @return
+     */
+    @Override
+    public boolean checkRfidCardUnique(SysUser user)
+    {
+        if (StringUtils.isEmpty(user.getRfidCard()))
+        {
+            return UserConstants.UNIQUE;
+        }
+        Long userId = StringUtils.isNull(user.getUserId()) ? -1L : user.getUserId();
+        SysUser info = userMapper.checkRfidCardUnique(user.getRfidCard());
         if (StringUtils.isNotNull(info) && info.getUserId().longValue() != userId.longValue())
         {
             return UserConstants.NOT_UNIQUE;
@@ -517,6 +551,10 @@ public class SysUserServiceImpl implements ISysUserService
                 {
                     BeanValidators.validateWithException(validator, user);
                     deptService.checkDeptDataScope(user.getDeptId());
+                    if (!checkRfidCardUnique(user))
+                    {
+                        throw new ServiceException("RFID已绑定其他用户");
+                    }
                     String password = configService.selectConfigByKey("sys.user.initPassword");
                     user.setPassword(SecurityUtils.encryptPassword(password));
                     user.setCreateBy(operName);
@@ -532,6 +570,10 @@ public class SysUserServiceImpl implements ISysUserService
                     deptService.checkDeptDataScope(user.getDeptId());
                     user.setUserId(u.getUserId());
                     user.setDeptId(u.getDeptId());
+                    if (!checkRfidCardUnique(user))
+                    {
+                        throw new ServiceException("RFID已绑定其他用户");
+                    }
                     user.setUpdateBy(operName);
                     userMapper.updateUser(user);
                     successNum++;

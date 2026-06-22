@@ -2,6 +2,19 @@
   <div class="login">
     <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">{{ title }}</h3>
+      <div class="rfid-login-box">
+        <el-input
+          v-model="rfidCard"
+          size="large"
+          placeholder="刷卡或输入RFID进入生产端"
+          clearable
+          @keyup.enter="handleRfidLogin"
+        >
+          <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
+        </el-input>
+        <el-button type="success" size="large" :loading="rfidLoading" @click="handleRfidLogin">一键进入生产端</el-button>
+      </div>
+      <div class="login-divider"><span>后台账号登录</span></div>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -66,6 +79,7 @@
 
 <script setup>
 import { getCodeImg } from "@/api/login"
+import { ElMessage } from "element-plus"
 import Cookies from "js-cookie"
 import { encrypt, decrypt } from "@/utils/jsencrypt"
 import useUserStore from '@/store/modules/user'
@@ -94,6 +108,8 @@ const loginRules = {
 
 const codeUrl = ref("")
 const loading = ref(false)
+const rfidLoading = ref(false)
+const rfidCard = ref("")
 // 验证码开关
 const captchaEnabled = ref(false)
 // 注册开关
@@ -135,6 +151,19 @@ function handleLogin() {
         if (captchaEnabled.value) getCode()
       })
     }
+  })
+}
+
+function handleRfidLogin() {
+  if (!rfidCard.value) {
+    ElMessage.warning("请刷卡或输入RFID卡号")
+    return
+  }
+  rfidLoading.value = true
+  userStore.rfidLogin(rfidCard.value.trim()).then(() => {
+    router.push({ path: "/tablet/report" })
+  }).catch(() => {
+    rfidLoading.value = false
   })
 }
 
@@ -193,6 +222,31 @@ getCookie()
     height: 39px;
     width: 14px;
     margin-left: 0px;
+  }
+}
+.rfid-login-box {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 10px;
+  margin-bottom: 14px;
+  :deep(.el-button) {
+    white-space: normal;
+    line-height: 18px;
+  }
+}
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  color: #909399;
+  font-size: 13px;
+  &::before,
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
   }
 }
 .login-tip {

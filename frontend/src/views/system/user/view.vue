@@ -34,6 +34,14 @@
       <el-row :gutter="20" class="mb8">
         <el-col :span="12">
           <div class="info-item">
+            <label class="info-label">RFID：</label>
+            <span class="info-value plaintext">{{ info.rfidCard || '-' }}</span>
+          </div>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20" class="mb8">
+        <el-col :span="12">
+          <div class="info-item">
             <label class="info-label">登录账号：</label>
             <span class="info-value plaintext">{{ info.userName }}</span>
           </div>

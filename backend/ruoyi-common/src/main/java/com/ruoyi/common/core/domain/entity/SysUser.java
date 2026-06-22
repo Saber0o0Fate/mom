@@ -47,6 +47,10 @@ public class SysUser extends BaseEntity
     @Excel(name = "手机号码", cellType = ColumnType.TEXT)
     private String phonenumber;
 
+    /** RFID卡号 */
+    @Excel(name = "RFID", cellType = ColumnType.TEXT)
+    private String rfidCard;
+
     /** 用户性别 */
     @Excel(name = "用户性别", readConverterExp = "0=男,1=女,2=未知")
     private String sex;
@@ -175,6 +179,17 @@ public class SysUser extends BaseEntity
     public void setPhonenumber(String phonenumber)
     {
         this.phonenumber = phonenumber;
+    }
+
+    @Size(min = 0, max = 64, message = "RFID长度不能超过64个字符")
+    public String getRfidCard()
+    {
+        return rfidCard;
+    }
+
+    public void setRfidCard(String rfidCard)
+    {
+        this.rfidCard = rfidCard;
     }
 
     public String getSex()
@@ -317,6 +332,7 @@ public class SysUser extends BaseEntity
             .append("nickName", getNickName())
             .append("email", getEmail())
             .append("phonenumber", getPhonenumber())
+            .append("rfidCard", getRfidCard())
             .append("sex", getSex())
             .append("avatar", getAvatar())
             .append("password", getPassword())

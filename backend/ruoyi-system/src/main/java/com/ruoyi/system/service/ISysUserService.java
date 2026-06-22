@@ -44,6 +44,14 @@ public interface ISysUserService
     public SysUser selectUserByUserName(String userName);
 
     /**
+     * 通过RFID查询用户
+     *
+     * @param rfidCard RFID卡号
+     * @return 用户对象信息
+     */
+    public SysUser selectUserByRfidCard(String rfidCard);
+
+    /**
      * 通过用户ID查询用户
      * 
      * @param userId 用户ID
@@ -90,6 +98,14 @@ public interface ISysUserService
      * @return 结果
      */
     public boolean checkEmailUnique(SysUser user);
+
+    /**
+     * 校验RFID是否唯一
+     *
+     * @param user 用户信息
+     * @return 结果
+     */
+    public boolean checkRfidCardUnique(SysUser user);
 
     /**
      * 校验用户是否允许操作

@@ -10,6 +10,9 @@
           <el-form-item label="手机号码" prop="phonenumber">
             <el-input v-model="queryParams.phonenumber" placeholder="请输入手机号码" clearable style="width: 240px" @keyup.enter="handleQuery" />
           </el-form-item>
+          <el-form-item label="RFID" prop="rfidCard">
+            <el-input v-model="queryParams.rfidCard" placeholder="请输入RFID卡号" clearable style="width: 240px" @keyup.enter="handleQuery" />
+          </el-form-item>
           <el-form-item label="状态" prop="status">
             <el-select v-model="queryParams.status" placeholder="用户状态" clearable style="width: 240px">
               <el-option v-for="dict in sys_normal_disable" :key="dict.value" :label="dict.label" :value="dict.value" />
@@ -54,6 +57,7 @@
           <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName" v-if="columns.nickName.visible" :show-overflow-tooltip="true" />
           <el-table-column label="部门" align="center" key="deptName" prop="dept.deptName" v-if="columns.deptName.visible" :show-overflow-tooltip="true" />
           <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber" v-if="columns.phonenumber.visible" width="120" />
+          <el-table-column label="RFID" align="center" key="rfidCard" prop="rfidCard" v-if="columns.rfidCard.visible" width="150" :show-overflow-tooltip="true" />
           <el-table-column label="状态" align="center" key="status" v-if="columns.status.visible">
             <template #default="scope">
               <el-switch
@@ -114,6 +118,13 @@
           <el-col :span="12">
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="form.email" placeholder="请输入邮箱" maxlength="50" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="RFID" prop="rfidCard">
+              <el-input v-model="form.rfidCard" placeholder="请输入RFID卡号" maxlength="64" clearable />
             </el-form-item>
           </el-col>
         </el-row>
@@ -218,6 +229,7 @@ const columns = ref({
   nickName: { label: '用户昵称', visible: true },
   deptName: { label: '部门', visible: true },
   phonenumber: { label: '手机号码', visible: true },
+  rfidCard: { label: 'RFID', visible: true },
   status: { label: '状态', visible: true },
   createTime: { label: '创建时间', visible: true }
 })
@@ -229,6 +241,7 @@ const data = reactive({
     pageSize: 10,
     userName: undefined,
     phonenumber: undefined,
+    rfidCard: undefined,
     status: undefined,
     deptId: undefined
   },
@@ -386,6 +399,7 @@ function reset() {
     phonenumber: undefined,
     email: undefined,
     sex: undefined,
+    rfidCard: undefined,
     status: "0",
     remark: undefined,
     postIds: [],

@@ -25,10 +25,10 @@
           <el-input v-model="rfidCard" size="large" placeholder="RFID刷卡号，如 RFID-ADMIN-001" clearable @keyup.enter="handleRfid">
             <template #prefix><el-icon><CreditCard /></el-icon></template>
           </el-input>
-          <el-button size="large" type="success" :loading="rfidLoading" @click="handleRfid">刷卡识别</el-button>
+          <el-button size="large" type="success" :loading="rfidLoading" @click="handleRfid">刷卡登录</el-button>
         </div>
         <div v-if="rfidUser" class="rfid-user">
-          已识别：{{ rfidUser.nickName || rfidUser.userName }}，请确认密码后进入报工终端
+          已识别：{{ rfidUser.nickName || rfidUser.userName }}，正在进入报工终端
         </div>
 
         <el-form-item prop="username">
@@ -70,7 +70,6 @@
 <script setup>
 import { User, Lock, Key, CreditCard } from '@element-plus/icons-vue'
 import { getCodeImg } from '@/api/login'
-import { workstationApi } from '@/api/mom/console'
 import { ElMessage } from 'element-plus'
 import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
@@ -154,11 +153,11 @@ function handleRfid() {
     return
   }
   rfidLoading.value = true
-  workstationApi.rfid({ rfidCard: rfidCard.value }).then(res => {
-    rfidUser.value = res.data
-    loginForm.value.username = res.data.userName
-    ElMessage.success('RFID识别成功')
-  }).finally(() => {
+  userStore.rfidLogin(rfidCard.value.trim()).then(() => {
+    rfidUser.value = { userName: rfidCard.value }
+    ElMessage.success('RFID登录成功')
+    router.push({ path: redirect.value || '/tablet/report' })
+  }).catch(() => {
     rfidLoading.value = false
   })
 }

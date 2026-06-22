@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.enums.UserStatus;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.exception.user.BlackListException;
@@ -50,6 +52,9 @@ public class SysLoginService
 
     @Autowired
     private ISysConfigService configService;
+
+    @Autowired
+    private SysPermissionService permissionService;
 
     /**
      * 登录验证
@@ -96,6 +101,47 @@ public class SysLoginService
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
         recordLoginInfo(loginUser.getUserId());
         // 生成token
+        return tokenService.createToken(loginUser);
+    }
+
+    /**
+     * RFID免密登录生产端
+     *
+     * @param rfidCard RFID卡号
+     * @return 结果
+     */
+    public String rfidLogin(String rfidCard)
+    {
+        if (StringUtils.isEmpty(rfidCard))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor("RFID", Constants.LOGIN_FAIL, "RFID不能为空"));
+            throw new ServiceException("RFID不能为空");
+        }
+        String blackStr = configService.selectConfigByKey("sys.login.blackIPList");
+        if (IpUtils.isMatchedIp(blackStr, IpUtils.getIpAddr()))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(rfidCard, Constants.LOGIN_FAIL, MessageUtils.message("login.blocked")));
+            throw new BlackListException();
+        }
+        SysUser user = userService.selectUserByRfidCard(rfidCard);
+        if (StringUtils.isNull(user))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(rfidCard, Constants.LOGIN_FAIL, "RFID未绑定用户"));
+            throw new ServiceException("RFID未绑定用户");
+        }
+        else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("user.password.delete")));
+            throw new ServiceException(MessageUtils.message("user.password.delete"));
+        }
+        else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
+        {
+            AsyncManager.me().execute(AsyncFactory.recordLogininfor(user.getUserName(), Constants.LOGIN_FAIL, MessageUtils.message("user.blocked")));
+            throw new ServiceException(MessageUtils.message("user.blocked"));
+        }
+        LoginUser loginUser = new LoginUser(user.getUserId(), user.getDeptId(), user, permissionService.getMenuPermission(user));
+        AsyncManager.me().execute(AsyncFactory.recordLogininfor(user.getUserName(), Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
+        recordLoginInfo(loginUser.getUserId());
         return tokenService.createToken(loginUser);
     }
 

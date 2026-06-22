@@ -67,3 +67,16 @@ export function getCodeImg() {
     timeout: 20000
   })
 }
+
+// RFID一键登录生产端
+export function rfidLogin(rfidCard) {
+  return request({
+    url: '/rfidLogin',
+    headers: {
+      isToken: false,
+      repeatSubmit: false
+    },
+    method: 'post',
+    data: { rfidCard }
+  })
+}

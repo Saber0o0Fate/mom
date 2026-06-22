@@ -2,6 +2,7 @@ package com.ruoyi.web.controller.system;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,21 @@ public class SysLoginController
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
+        ajax.put(Constants.TOKEN, token);
+        return ajax;
+    }
+
+    /**
+     * RFID免密登录生产端
+     *
+     * @param body 登录信息
+     * @return 结果
+     */
+    @PostMapping("/rfidLogin")
+    public AjaxResult rfidLogin(@RequestBody Map<String, String> body)
+    {
+        AjaxResult ajax = AjaxResult.success();
+        String token = loginService.rfidLogin(body == null ? null : body.get("rfidCard"));
         ajax.put(Constants.TOKEN, token);
         return ajax;
     }
