@@ -41,7 +41,7 @@
         <el-table
           v-loading="loading"
           :data="rows"
-          height="calc(100vh - 330px)"
+          height="100%"
           highlight-current-row
           class="mbom-table"
           :row-class-name="masterRowClassName"
@@ -421,15 +421,20 @@ loadOptions(); getList()
   display: grid;
   grid-template-columns: minmax(520px, 0.48fr) minmax(620px, 0.52fr);
   gap: 12px;
-  align-items: start;
+  align-items: stretch;
+  height: calc(100vh - 226px);
+  min-height: 560px;
 }
 
 .mbom-panel {
   min-width: 0;
+  min-height: 0;
   background: #fff;
   border: 1px solid #e5eaf3;
   border-radius: 6px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-head,
@@ -498,6 +503,15 @@ loadOptions(); getList()
   --el-table-row-hover-bg-color: #eef6ff;
 }
 
+.master-panel > .mbom-table {
+  flex: 1;
+  min-height: 0;
+}
+
+.master-panel :deep(.pagination-container) {
+  flex-shrink: 0;
+}
+
 .mbom-table :deep(.el-table__header th) {
   color: #25364d;
   font-weight: 700;
@@ -551,11 +565,13 @@ loadOptions(); getList()
 }
 
 .detail-empty {
-  height: calc(100vh - 330px);
+  flex: 1;
+  min-height: 0;
 }
 
 .mbom-structure {
-  height: calc(100vh - 330px);
+  flex: 1;
+  min-height: 0;
   padding: 12px;
   overflow: auto;
   background: #f8fafd;
@@ -737,6 +753,8 @@ loadOptions(); getList()
 @media (max-width: 1360px) {
   .mbom-workbench {
     grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
   }
 
   .mbom-table,
