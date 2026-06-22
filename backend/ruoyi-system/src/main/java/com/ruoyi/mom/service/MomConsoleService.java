@@ -16,6 +16,7 @@ import com.ruoyi.mom.domain.MomPbomImport;
 import com.ruoyi.mom.domain.MomProduct;
 import com.ruoyi.mom.domain.MomResource;
 import com.ruoyi.mom.domain.MomStepReport;
+import com.ruoyi.mom.domain.MomTrayImport;
 import com.ruoyi.mom.mapper.MomBaseMapper;
 import com.ruoyi.mom.mapper.MomConsoleMapper;
 import com.ruoyi.system.service.ISysCodeRuleService;
@@ -161,19 +162,50 @@ public class MomConsoleService
     }
 
     public List<Map<String, Object>> selectTrayList(Map<String, Object> query) { return normalizeList(mapper.selectTrayList(query)); }
+    public List<MomTrayImport> exportTray(Map<String, Object> query)
+    {
+        List<MomTrayImport> rows = new ArrayList<>();
+        for (Map<String, Object> tray : selectTrayList(query))
+        {
+            List<Map<String, Object>> items = selectTrayItems(longValue(tray.get("trayId")));
+            if (items.isEmpty())
+            {
+                rows.add(buildTrayExportRow(tray, null));
+            }
+            else
+            {
+                for (Map<String, Object> item : items)
+                {
+                    rows.add(buildTrayExportRow(tray, item));
+                }
+            }
+        }
+        return rows;
+    }
+
+    @Transactional
     public int insertTray(Map<String, Object> tray)
     {
         require(tray, "trayCode", "托盘编码不能为空");
         if (!tray.containsKey("status") || tray.get("status") == null) tray.put("status", "0");
         ensure(mapper.countTrayCode(value(tray, "trayCode"), null) == 0, "托盘编码已存在");
-        return mapper.insertTray(tray);
+        int rows = mapper.insertTray(tray);
+        saveTrayItemsFromPayload(tray, longValue(tray.get("trayId")), value(tray, "createBy"));
+        return rows;
     }
+    @Transactional
     public int updateTray(Map<String, Object> tray)
     {
         Long id = longValue(tray.get("trayId"));
         ensure(id != null, "托盘ID不能为空");
         ensure(mapper.countTrayCode(value(tray, "trayCode"), id) == 0, "托盘编码已存在");
-        return mapper.updateTray(tray);
+        int rows = mapper.updateTray(tray);
+        if (tray.containsKey("items"))
+        {
+            mapper.deleteTrayItemByTrayIds(new Long[] { id });
+            saveTrayItemsFromPayload(tray, id, value(tray, "updateBy"));
+        }
+        return rows;
     }
     @Transactional
     public int deleteTrayByIds(Long[] ids)
@@ -186,10 +218,84 @@ public class MomConsoleService
     {
         require(item, "trayId", "托盘不能为空");
         require(item, "materialId", "物料不能为空");
+        if (!item.containsKey("status") || item.get("status") == null) item.put("status", "0");
         return mapper.insertTrayItem(item);
     }
     public int updateTrayItem(Map<String, Object> item) { return mapper.updateTrayItem(item); }
     public int deleteTrayItemByIds(Long[] ids) { return mapper.deleteTrayItemByIds(ids); }
+
+    @Transactional
+    public String importTray(List<MomTrayImport> rows, boolean updateSupport, String operName)
+    {
+        ensure(rows != null && !rows.isEmpty(), "导入数据不能为空");
+        Map<String, List<MomTrayImport>> groups = new LinkedHashMap<>();
+        int rowNum = 1;
+        for (MomTrayImport row : rows)
+        {
+            rowNum++;
+            ensure(StringUtils.isNotBlank(row.getTrayCode()), "第 " + rowNum + " 行托盘编码不能为空");
+            groups.computeIfAbsent(row.getTrayCode().trim(), key -> new ArrayList<>()).add(row);
+        }
+
+        int successNum = 0;
+        int failureNum = 0;
+        StringBuilder successMsg = new StringBuilder();
+        StringBuilder failureMsg = new StringBuilder();
+        for (Map.Entry<String, List<MomTrayImport>> entry : groups.entrySet())
+        {
+            String trayCode = entry.getKey();
+            List<MomTrayImport> trayRows = entry.getValue();
+            try
+            {
+                MomTrayImport first = trayRows.get(0);
+                Map<String, Object> tray = buildTrayImportHeader(first, operName);
+                Map<String, Object> existing = normalize(mapper.selectTrayByCode(trayCode));
+                if (existing == null)
+                {
+                    insertTray(tray);
+                }
+                else if (updateSupport)
+                {
+                    tray.put("trayId", existing.get("trayId"));
+                    tray.put("updateBy", operName);
+                    mapper.updateTray(tray);
+                    mapper.deleteTrayItemByTrayIds(new Long[] { longValue(existing.get("trayId")) });
+                    tray.put("trayId", existing.get("trayId"));
+                }
+                else
+                {
+                    failureNum++;
+                    failureMsg.append("<br/>").append(failureNum).append("、托盘 ").append(trayCode).append(" 已存在");
+                    continue;
+                }
+
+                Long trayId = longValue(tray.get("trayId"));
+                for (MomTrayImport row : trayRows)
+                {
+                    if (StringUtils.isBlank(row.getLocationCode()) && StringUtils.isBlank(row.getMaterialCode()) && row.getQuantity() == null)
+                    {
+                        continue;
+                    }
+                    Map<String, Object> item = buildTrayImportItem(row, trayId, operName);
+                    mapper.insertTrayItem(item);
+                }
+                successNum++;
+                successMsg.append("<br/>").append(successNum).append("、托盘 ").append(trayCode).append(" 导入成功");
+            }
+            catch (Exception e)
+            {
+                failureNum++;
+                failureMsg.append("<br/>").append(failureNum).append("、托盘 ").append(trayCode).append(" 导入失败：").append(e.getMessage());
+            }
+        }
+        if (failureNum > 0)
+        {
+            failureMsg.insert(0, "很抱歉，导入失败！共 " + failureNum + " 条托盘数据不正确，错误如下：");
+            throw new ServiceException(failureMsg.toString());
+        }
+        successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 个托盘，数据如下：");
+        return successMsg.toString();
+    }
 
     public List<Map<String, Object>> selectDeviceCategoryList(Map<String, Object> query) { return normalizeList(mapper.selectDeviceCategoryList(query)); }
     public int insertDeviceCategory(Map<String, Object> category)
@@ -397,6 +503,104 @@ public class MomConsoleService
     {
         if (value == null || String.valueOf(value).isEmpty()) return BigDecimal.ZERO;
         return new BigDecimal(String.valueOf(value));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void saveTrayItemsFromPayload(Map<String, Object> tray, Long trayId, String operName)
+    {
+        Object payload = tray == null ? null : tray.get("items");
+        if (!(payload instanceof List<?>) || trayId == null)
+        {
+            return;
+        }
+        for (Object value : (List<?>) payload)
+        {
+            if (!(value instanceof Map<?, ?>))
+            {
+                continue;
+            }
+            Map<String, Object> item = new LinkedHashMap<>((Map<String, Object>) value);
+            if (item.get("materialId") == null && StringUtils.isBlank(value(item, "materialCode")))
+            {
+                continue;
+            }
+            item.put("trayId", trayId);
+            item.put("createBy", operName);
+            insertTrayItem(item);
+        }
+    }
+
+    private MomTrayImport buildTrayExportRow(Map<String, Object> tray, Map<String, Object> item)
+    {
+        MomTrayImport row = new MomTrayImport();
+        row.setTrayCode(value(tray, "trayCode"));
+        row.setTrayName(value(tray, "trayName"));
+        row.setResourceCode(value(tray, "resourceCode"));
+        row.setStatus(value(tray, "status"));
+        row.setRemark(value(tray, "remark"));
+        if (item != null)
+        {
+            row.setLocationCode(value(item, "locationCode"));
+            row.setMaterialCode(value(item, "materialCode"));
+            row.setMaterialName(value(item, "materialName"));
+            row.setQuantity(decimalValue(item.get("quantity")));
+            if (StringUtils.isNotBlank(value(item, "remark")))
+            {
+                row.setRemark(value(item, "remark"));
+            }
+        }
+        return row;
+    }
+
+    private Map<String, Object> buildTrayImportHeader(MomTrayImport row, String operName)
+    {
+        Map<String, Object> tray = new LinkedHashMap<>();
+        tray.put("trayCode", row.getTrayCode().trim());
+        tray.put("trayName", row.getTrayName());
+        tray.put("trayType", "shape");
+        tray.put("status", normalizeStatus(row.getStatus()));
+        tray.put("remark", row.getRemark());
+        tray.put("createBy", operName);
+        if (StringUtils.isNotBlank(row.getResourceCode()))
+        {
+            MomResource station = baseMapper.selectResourceByCode(row.getResourceCode().trim());
+            ensure(station != null, "工位编码不存在：" + row.getResourceCode());
+            ensure(StringUtils.equals(station.getResourceType(), "station"), "资源不是工位类型：" + row.getResourceCode());
+            tray.put("resourceId", station.getResourceId());
+        }
+        return tray;
+    }
+
+    private Map<String, Object> buildTrayImportItem(MomTrayImport row, Long trayId, String operName)
+    {
+        ensure(StringUtils.isNotBlank(row.getLocationCode()), "托盘位不能为空");
+        ensure(StringUtils.isNotBlank(row.getMaterialCode()), "物料编码不能为空");
+        ensure(row.getQuantity() != null, "数量不能为空");
+        ensure(row.getQuantity().compareTo(BigDecimal.ZERO) > 0, "数量必须大于0");
+        MomMaterial material = baseMapper.selectMaterialByCode(row.getMaterialCode().trim());
+        ensure(material != null, "物料编码不存在：" + row.getMaterialCode());
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("trayId", trayId);
+        item.put("materialId", material.getMaterialId());
+        item.put("locationCode", row.getLocationCode());
+        item.put("quantity", row.getQuantity());
+        item.put("status", "0");
+        item.put("remark", row.getRemark());
+        item.put("createBy", operName);
+        return item;
+    }
+
+    private String normalizeStatus(String status)
+    {
+        if (StringUtils.isBlank(status) || "正常".equals(status))
+        {
+            return "0";
+        }
+        if ("停用".equals(status))
+        {
+            return "1";
+        }
+        return status;
     }
 
     private List<Map<String, Object>> normalizeList(List<Map<String, Object>> rows)

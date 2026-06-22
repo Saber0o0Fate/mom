@@ -20,6 +20,7 @@ public interface MomConsoleMapper
     public int deletePbomItemByPbomIds(Long[] pbomIds);
 
     public List<Map<String, Object>> selectTrayList(Map<String, Object> query);
+    public Map<String, Object> selectTrayByCode(String trayCode);
     public int countTrayCode(@Param("trayCode") String trayCode, @Param("trayId") Long trayId);
     public int insertTray(Map<String, Object> tray);
     public int updateTray(Map<String, Object> tray);

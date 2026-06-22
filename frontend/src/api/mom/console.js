@@ -25,7 +25,10 @@ export const trayApi = {
   items: (id) => request({ url: `/mom/tray/${id}/items`, method: 'get' }),
   addItem: (data) => request({ url: '/mom/tray/item', method: 'post', data }),
   updateItem: (data) => request({ url: '/mom/tray/item', method: 'put', data }),
-  removeItem: (id) => request({ url: `/mom/tray/item/${id}`, method: 'delete' })
+  removeItem: (id) => request({ url: `/mom/tray/item/${id}`, method: 'delete' }),
+  exportUrl: '/mom/tray/export',
+  importUrl: '/mom/tray/importData',
+  importTemplateUrl: '/mom/tray/importTemplate'
 }
 
 export const deviceApi = {

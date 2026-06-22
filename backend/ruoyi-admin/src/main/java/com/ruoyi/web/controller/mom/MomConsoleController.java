@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.mom;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.mom.domain.MomPbomImport;
+import com.ruoyi.mom.domain.MomTrayImport;
 import com.ruoyi.mom.service.MomConsoleService;
 
 /**
@@ -143,6 +145,33 @@ public class MomConsoleController extends BaseController
     {
         startPage();
         return getDataTable(service.selectTrayList(query));
+    }
+
+    @PreAuthorize("@ss.hasPermi('mom:tray:export')")
+    @Log(title = "形迹托盘", businessType = BusinessType.EXPORT)
+    @PostMapping("/tray/export")
+    public void exportTray(HttpServletResponse response, @RequestParam Map<String, Object> query)
+    {
+        ExcelUtil<MomTrayImport> util = new ExcelUtil<MomTrayImport>(MomTrayImport.class);
+        util.exportExcel(response, service.exportTray(query), "形迹托盘数据");
+    }
+
+    @PreAuthorize("@ss.hasPermi('mom:tray:add')")
+    @Log(title = "形迹托盘", businessType = BusinessType.IMPORT)
+    @PostMapping("/tray/importData")
+    public AjaxResult importTray(@RequestParam("file") MultipartFile file, @RequestParam(value = "updateSupport", defaultValue = "false") boolean updateSupport) throws Exception
+    {
+        ExcelUtil<MomTrayImport> util = new ExcelUtil<MomTrayImport>(MomTrayImport.class);
+        List<MomTrayImport> importList = util.importExcel(file.getInputStream());
+        String message = service.importTray(importList, updateSupport, getUsername());
+        return success(message);
+    }
+
+    @PostMapping("/tray/importTemplate")
+    public void importTrayTemplate(HttpServletResponse response)
+    {
+        ExcelUtil<MomTrayImport> util = new ExcelUtil<MomTrayImport>(MomTrayImport.class);
+        util.importTemplateExcel(response, "形迹托盘导入模板");
     }
 
     @PreAuthorize("@ss.hasPermi('mom:tray:add')")

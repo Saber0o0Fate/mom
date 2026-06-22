@@ -996,6 +996,7 @@ insert into sys_menu values('2341', '托盘查询', '2304', '1', '', '', '', '',
 insert into sys_menu values('2342', '托盘新增', '2304', '2', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:tray:add', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
 insert into sys_menu values('2343', '托盘修改', '2304', '3', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:tray:edit', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
 insert into sys_menu values('2344', '托盘删除', '2304', '4', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:tray:remove', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
+insert into sys_menu values('2345', '托盘导出', '2304', '5', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:tray:export', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
 insert into sys_menu values('2351', '设备查询', '2401', '1', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:device:query', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
 insert into sys_menu values('2352', '设备新增', '2401', '2', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:device:add', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');
 insert into sys_menu values('2353', '设备修改', '2401', '3', '', '', '', '', 1, 0, 'F', '0', '0', 'mom:device:edit', '#', 'admin', CURRENT_TIMESTAMP(), '', null, '');

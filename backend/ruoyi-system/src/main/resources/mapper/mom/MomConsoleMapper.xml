@@ -110,7 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
 	<select id="selectTrayList" parameterType="map" resultType="map">
 		select t.tray_id trayId, t.tray_code trayCode, t.tray_name trayName, t.tray_type trayType,
-			t.resource_id resourceId, r.resource_name resourceName, t.status, t.create_time createTime, t.remark
+			t.resource_id resourceId, r.resource_code resourceCode, r.resource_name resourceName, t.status, t.create_time createTime, t.remark
 		from mom_tray t left join mom_resource r on t.resource_id = r.resource_id
 		<where>
 			<if test="trayCode != null and trayCode != ''">and t.tray_code like concat('%', #{trayCode}, '%')</if>
@@ -119,6 +119,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="status != null and status != ''">and t.status = #{status}</if>
 		</where>
 		order by t.tray_id desc
+	</select>
+
+	<select id="selectTrayByCode" parameterType="String" resultType="map">
+		select t.tray_id trayId, t.tray_code trayCode, t.tray_name trayName, t.tray_type trayType,
+			t.resource_id resourceId, r.resource_code resourceCode, r.resource_name resourceName, t.status, t.create_time createTime, t.remark
+		from mom_tray t left join mom_resource r on t.resource_id = r.resource_id
+		where t.tray_code = #{trayCode}
 	</select>
 
 	<select id="countTrayCode" resultType="int">
