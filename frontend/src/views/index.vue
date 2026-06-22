@@ -6,6 +6,11 @@
         <h1>生产管理工作台</h1>
         <p class="hero-copy">围绕物料、工艺、BOM、工单、排产和报工的日常维护入口，帮助现场数据更清楚、更好查、更容易维护。</p>
       </div>
+      <div class="hero-status">
+        <span><i class="status-dot"></i>数据维护</span>
+        <span>工单执行</span>
+        <span>现场追溯</span>
+      </div>
       <div class="hero-actions">
         <el-button type="primary" icon="Plus" @click="go('/mom/production/workorder')">创建工单</el-button>
         <el-button plain icon="Search" @click="go('/mom/base/material')">物料查询</el-button>
@@ -134,36 +139,67 @@ function go(path) {
 }
 
 .hero-band {
-  min-height: 190px;
-  padding: 28px 32px;
+  min-height: 112px;
+  padding: 18px 20px;
   border-radius: 8px;
-  background: linear-gradient(135deg, #0f7cff 0%, #18a58d 100%);
-  color: #fff;
-  display: flex;
+  background: #fff;
+  border: 1px solid #e7ebf2;
+  color: #1f2d3d;
+  box-shadow: 0 6px 18px rgba(31, 45, 61, .05);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 18px;
 }
 
 .eyebrow {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 12px;
   letter-spacing: 0;
-  opacity: .82;
+  color: #8492a6;
 }
 
 .hero-band h1 {
   margin: 0;
-  font-size: 34px;
-  line-height: 42px;
+  font-size: 24px;
+  line-height: 32px;
   font-weight: 700;
 }
 
 .hero-copy {
-  max-width: 680px;
-  margin: 12px 0 0;
-  line-height: 24px;
-  opacity: .9;
+  max-width: 720px;
+  margin: 8px 0 0;
+  line-height: 21px;
+  color: #606b7b;
+  font-size: 13px;
+}
+
+.hero-status {
+  min-width: 250px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #edf0f5;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 10px;
+  color: #606b7b;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.hero-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #18a058;
+  box-shadow: 0 0 0 4px rgba(24, 160, 88, .12);
 }
 
 .hero-actions {
@@ -359,6 +395,13 @@ function go(path) {
 .purple { color: #6b5dd3; background: #f1efff; }
 
 @media (max-width: 1200px) {
+  .hero-band {
+    grid-template-columns: 1fr;
+  }
+  .hero-status {
+    min-width: 0;
+    width: fit-content;
+  }
   .metric-grid,
   .process-line {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -369,14 +412,17 @@ function go(path) {
 }
 
 @media (max-width: 768px) {
-  .hero-band {
-    align-items: flex-start;
-    flex-direction: column;
-  }
   .metric-grid,
   .shortcut-grid,
   .process-line {
     grid-template-columns: 1fr;
+  }
+  .hero-status {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+  .hero-actions {
+    justify-content: flex-start;
   }
 }
 </style>
