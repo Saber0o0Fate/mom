@@ -1,28 +1,24 @@
 <template>
   <div class="home-page">
-    <section class="hero-band">
-      <div>
-        <p class="eyebrow">Manufacturing Operations Management</p>
-        <h1>生产管理工作台</h1>
-        <p class="hero-copy">围绕物料、工艺、BOM、工单、排产和报工的日常维护入口，帮助现场数据更清楚、更好查、更容易维护。</p>
-      </div>
-      <div class="hero-status">
-        <span><i class="status-dot"></i>数据维护</span>
-        <span>工单执行</span>
-        <span>现场追溯</span>
-      </div>
-      <div class="hero-actions">
-        <el-button type="primary" icon="Plus" @click="go('/mom/production/workorder')">创建工单</el-button>
-        <el-button plain icon="Search" @click="go('/mom/base/material')">物料查询</el-button>
-      </div>
-    </section>
-
-    <section class="metric-grid">
-      <div v-for="item in metrics" :key="item.label" class="metric-card">
-        <div class="metric-icon" :class="item.tone"><svg-icon :icon-class="item.icon" /></div>
+    <section class="overview-panel">
+      <div class="overview-head">
         <div>
-          <div class="metric-value">{{ item.value }}</div>
-          <div class="metric-label">{{ item.label }}</div>
+          <p class="eyebrow">MOM WORKBENCH</p>
+          <h1>生产管理工作台</h1>
+          <p class="hero-copy">围绕物料、工艺、BOM、工单、排产和报工的日常维护入口。</p>
+        </div>
+        <div class="hero-actions">
+          <el-button type="primary" icon="Plus" @click="go('/mom/production/workorder')">创建工单</el-button>
+          <el-button plain icon="Search" @click="go('/mom/base/material')">物料查询</el-button>
+        </div>
+      </div>
+      <div class="metric-grid">
+        <div v-for="item in metrics" :key="item.label" class="metric-card">
+          <div class="metric-icon" :class="item.tone"><svg-icon :icon-class="item.icon" /></div>
+          <div>
+            <div class="metric-value">{{ item.value }}</div>
+            <div class="metric-label">{{ item.label }}</div>
+          </div>
         </div>
       </div>
     </section>
@@ -138,68 +134,43 @@ function go(path) {
   color: #1f2d3d;
 }
 
-.hero-band {
-  min-height: 112px;
-  padding: 18px 20px;
-  border-radius: 8px;
+.overview-panel {
+  padding: 18px;
   background: #fff;
   border: 1px solid #e7ebf2;
-  color: #1f2d3d;
+  border-radius: 8px;
   box-shadow: 0 6px 18px rgba(31, 45, 61, .05);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.overview-head {
+  display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #edf0f5;
 }
 
 .eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-size: 12px;
   letter-spacing: 0;
   color: #8492a6;
 }
 
-.hero-band h1 {
+.overview-head h1 {
   margin: 0;
-  font-size: 24px;
-  line-height: 32px;
+  font-size: 22px;
+  line-height: 30px;
   font-weight: 700;
 }
 
 .hero-copy {
   max-width: 720px;
-  margin: 8px 0 0;
-  line-height: 21px;
+  margin: 6px 0 0;
+  line-height: 20px;
   color: #606b7b;
   font-size: 13px;
-}
-
-.hero-status {
-  min-width: 250px;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: #f8fafc;
-  border: 1px solid #edf0f5;
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  gap: 10px;
-  color: #606b7b;
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.hero-status span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #18a058;
-  box-shadow: 0 0 0 4px rgba(24, 160, 88, .12);
 }
 
 .hero-actions {
@@ -213,10 +184,9 @@ function go(path) {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 14px 0;
+  margin-top: 14px;
 }
 
-.metric-card,
 .panel {
   background: #fff;
   border: 1px solid #e7ebf2;
@@ -225,8 +195,11 @@ function go(path) {
 }
 
 .metric-card {
-  min-height: 92px;
-  padding: 18px;
+  min-height: 82px;
+  padding: 14px;
+  border: 1px solid #edf0f5;
+  border-radius: 8px;
+  background: #fbfcff;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -258,6 +231,7 @@ function go(path) {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(320px, .75fr);
   gap: 14px;
+  margin-top: 14px;
 }
 
 .panel {
@@ -395,12 +369,9 @@ function go(path) {
 .purple { color: #6b5dd3; background: #f1efff; }
 
 @media (max-width: 1200px) {
-  .hero-band {
-    grid-template-columns: 1fr;
-  }
-  .hero-status {
-    min-width: 0;
-    width: fit-content;
+  .overview-head {
+    align-items: flex-start;
+    flex-direction: column;
   }
   .metric-grid,
   .process-line {
@@ -415,10 +386,6 @@ function go(path) {
   .metric-grid,
   .shortcut-grid,
   .process-line {
-    grid-template-columns: 1fr;
-  }
-  .hero-status {
-    width: 100%;
     grid-template-columns: 1fr;
   }
   .hero-actions {
