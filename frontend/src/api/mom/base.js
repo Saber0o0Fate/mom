@@ -1,41 +1,5 @@
 import request from '@/utils/request'
 
-const buildMaterialCategoryTree = (items = []) => {
-  const nodes = new Map()
-  const roots = []
-
-  items.forEach(item => {
-    const id = item.categoryId
-    nodes.set(String(id), {
-      ...item,
-      id,
-      label: item.categoryName,
-      children: []
-    })
-  })
-
-  items.forEach(item => {
-    const node = nodes.get(String(item.categoryId))
-    const parentId = item.parentId
-    if (parentId && Number(parentId) !== 0 && nodes.has(String(parentId))) {
-      nodes.get(String(parentId)).children.push(node)
-    } else {
-      roots.push(node)
-    }
-  })
-
-  const trimEmptyChildren = (tree) => tree.map(node => {
-    if (node.children?.length) {
-      node.children = trimEmptyChildren(node.children)
-    } else {
-      delete node.children
-    }
-    return node
-  })
-
-  return trimEmptyChildren(roots)
-}
-
 const crud = (path, key) => ({
   list: (query) => request({ url: `/mom/base/${path}/list`, method: 'get', params: query }),
   get: (id) => request({ url: `/mom/base/${path}/${id}`, method: 'get' }),
@@ -55,10 +19,7 @@ export const materialApi = {
 
 export const materialCategoryApi = {
   ...crud('materialCategory', 'categoryId'),
-  tree: () => request({ url: '/mom/base/materialCategory/list', method: 'get' }).then(res => {
-    const list = res.data || res.rows || []
-    return { ...res, data: buildMaterialCategoryTree(list) }
-  })
+  tree: () => request({ url: '/mom/base/materialCategory/tree', method: 'get' })
 }
 
 export const productApi = {
