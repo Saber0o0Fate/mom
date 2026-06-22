@@ -20,6 +20,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.SysNoticeReadUser;
 import com.ruoyi.system.service.ISysNoticeReadService;
 import com.ruoyi.system.service.ISysNoticeService;
 
@@ -122,6 +123,18 @@ public class SysNoticeController extends BaseController
         Long[] noticeIds = Convert.toLongArray(ids);
         noticeReadService.markReadBatch(userId, noticeIds);
         return success();
+    }
+
+    /**
+     * 查询公告已读用户列表
+     */
+    @PreAuthorize("@ss.hasPermi('system:notice:list')")
+    @GetMapping("/readUsers/list")
+    public TableDataInfo readUsersList(Long noticeId, String searchValue)
+    {
+        startPage();
+        List<SysNoticeReadUser> list = noticeReadService.selectReadUsersByNoticeId(noticeId, searchValue);
+        return getDataTable(list);
     }
 
     /**

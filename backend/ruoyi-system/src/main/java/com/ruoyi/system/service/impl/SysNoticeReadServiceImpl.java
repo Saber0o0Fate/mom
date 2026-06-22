@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.system.domain.SysNoticeRead;
 import com.ruoyi.system.domain.SysNotice;
+import com.ruoyi.system.domain.SysNoticeReadUser;
 import com.ruoyi.system.mapper.SysNoticeReadMapper;
 import com.ruoyi.system.service.ISysNoticeReadService;
 
@@ -69,5 +70,14 @@ public class SysNoticeReadServiceImpl implements ISysNoticeReadService
     public void deleteByNoticeIds(Long[] noticeIds)
     {
         noticeReadMapper.deleteByNoticeIds(noticeIds);
+    }
+
+    /**
+     * 查询已阅读某公告的用户列表
+     */
+    @Override
+    public List<SysNoticeReadUser> selectReadUsersByNoticeId(Long noticeId, String searchValue)
+    {
+        return noticeReadMapper.selectReadUsersByNoticeId(noticeId, searchValue);
     }
 }
