@@ -636,7 +636,7 @@ create table sys_notice (
   notice_id         int          not null auto_increment,
   notice_title      varchar(50)     not null,
   notice_type       char(1)         not null,
-  notice_content    longblob        default null,
+  notice_content    clob            default null,
   status            char(1)         default '0',
   create_by         varchar(64)     default '',
   create_time       timestamp,

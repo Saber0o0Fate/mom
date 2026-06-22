@@ -21,6 +21,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select notice_id, notice_title, notice_type, cast(notice_content as char) as notice_content, status, create_by, create_time, update_by, update_time, remark 
 		from sys_notice
     </sql>
+
+    <sql id="selectNoticeListVo">
+        select notice_id, notice_title, notice_type, status, create_by, create_time, update_by, update_time, remark
+		from sys_notice
+    </sql>
     
     <select id="selectNoticeById" parameterType="Long" resultMap="SysNoticeResult">
         <include refid="selectNoticeVo"/>
@@ -28,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
     
     <select id="selectNoticeList" parameterType="SysNotice" resultMap="SysNoticeResult">
-        <include refid="selectNoticeVo"/>
+        <include refid="selectNoticeListVo"/>
         <where>
 			<if test="noticeTitle != null and noticeTitle != ''">
 				AND notice_title like concat('%', #{noticeTitle}, '%')
