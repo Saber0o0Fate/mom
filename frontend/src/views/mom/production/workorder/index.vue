@@ -12,6 +12,7 @@
       <el-col :span="1.5"><el-button type="primary" plain icon="Plus" @click="handleAdd" v-hasPermi="['mom:workorder:add']">新增</el-button></el-col>
       <el-col :span="1.5"><el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate()" v-hasPermi="['mom:workorder:edit']">修改</el-button></el-col>
       <el-col :span="1.5"><el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete()" v-hasPermi="['mom:workorder:remove']">删除</el-button></el-col>
+      <el-col :span="1.5"><el-button type="info" plain icon="Upload" @click="handleImport" v-hasPermi="['mom:workorder:add']">导入</el-button></el-col>
       <el-col :span="1.5"><el-button type="warning" plain icon="Download" @click="handleExport" v-hasPermi="['mom:workorder:export']">导出</el-button></el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" />
     </el-row>
@@ -73,6 +74,8 @@
       </el-form>
       <template #footer><div class="dialog-footer"><el-button type="primary" @click="submitFinish">确定</el-button><el-button @click="finishOpen = false">取消</el-button></div></template>
     </el-dialog>
+
+    <excel-import-dialog ref="importWorkOrderRef" title="生产工单导入" :action="workOrderApi.importUrl" :template-action="workOrderApi.importTemplateUrl" template-file-name="work_order_import_template" update-support-label="是否更新已存在的生产工单" @success="handleImportSuccess" />
   </div>
 </template>
 
@@ -115,6 +118,8 @@ function handleAdd() { reset(); open.value = true; title.value = '新增生产�
 function handleUpdate(row) { reset(); workOrderApi.get(row?.workOrderId || ids.value[0]).then(r => { form.value = r.data; open.value = true; title.value = '修改生产工单' }) }
 function submitForm() { proxy.$refs.formRef.validate(valid => { if (!valid) return; const save = form.value.workOrderId ? workOrderApi.update : workOrderApi.add; save(form.value).then(() => { proxy.$modal.msgSuccess('保存成功'); open.value = false; getList() }) }) }
 function handleDelete(row) { const delIds = row?.workOrderId || ids.value; proxy.$modal.confirm('确认删除选中的草稿工单吗？').then(() => workOrderApi.remove(delIds)).then(() => { getList(); proxy.$modal.msgSuccess('删除成功') }) }
+function handleImport() { proxy.$refs.importWorkOrderRef.open() }
+function handleImportSuccess() { getList() }
 function handleExport() { proxy.download(workOrderApi.exportUrl, { ...queryParams.value }, `work_order_${new Date().getTime()}.xlsx`) }
 function handleRelease(row) { proxy.$modal.confirm(`确认下达工单 ${row.workOrderCode} 吗？`).then(() => workOrderApi.release(row.workOrderId)).then(() => { getList(); proxy.$modal.msgSuccess('下达成功') }) }
 function handleStart(row) { proxy.$modal.confirm(`确认工单 ${row.workOrderCode} 开工吗？`).then(() => workOrderApi.start(row.workOrderId)).then(() => { getList(); proxy.$modal.msgSuccess('开工成功') }) }

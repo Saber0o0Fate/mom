@@ -10,5 +10,7 @@ export const workOrderApi = {
   start: (id) => request({ url: `/mom/workorder/${id}/start`, method: 'post' }),
   finish: (id, completedQty) => request({ url: `/mom/workorder/${id}/finish`, method: 'post', params: { completedQty } }),
   close: (id) => request({ url: `/mom/workorder/${id}/close`, method: 'post' }),
-  exportUrl: '/mom/workorder/export'
+  exportUrl: '/mom/workorder/export',
+  importUrl: '/mom/workorder/importData',
+  importTemplateUrl: '/mom/workorder/importTemplate'
 }

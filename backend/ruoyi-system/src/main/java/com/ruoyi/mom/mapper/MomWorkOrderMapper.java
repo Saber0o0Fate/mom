@@ -11,6 +11,7 @@ public interface MomWorkOrderMapper
 {
     public List<MomWorkOrder> selectWorkOrderList(MomWorkOrder workOrder);
     public MomWorkOrder selectWorkOrderById(Long workOrderId);
+    public MomWorkOrder selectWorkOrderByCode(String workOrderCode);
     public int countWorkOrderCode(@Param("workOrderCode") String workOrderCode, @Param("workOrderId") Long workOrderId);
     public int insertWorkOrder(MomWorkOrder workOrder);
     public int updateWorkOrder(MomWorkOrder workOrder);

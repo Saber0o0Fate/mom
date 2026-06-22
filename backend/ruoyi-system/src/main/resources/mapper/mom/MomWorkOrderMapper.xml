@@ -68,6 +68,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<include refid="selectWorkOrderVo"/> where w.work_order_id = #{workOrderId}
 	</select>
 
+	<select id="selectWorkOrderByCode" parameterType="String" resultMap="MomWorkOrderResult">
+		<include refid="selectWorkOrderVo"/> where w.work_order_code = #{workOrderCode}
+	</select>
+
 	<select id="countWorkOrderCode" resultType="int">
 		select count(1) from mom_work_order where work_order_code = #{workOrderCode}
 		<if test="workOrderId != null">and work_order_id != #{workOrderId}</if>
