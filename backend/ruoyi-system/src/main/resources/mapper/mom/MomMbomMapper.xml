@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mom.mapper.MomMbomMapper">
+
+	<resultMap type="MomMbom" id="MomMbomResult">
+		<id property="mbomId" column="mbom_id" />
+		<result property="mbomCode" column="mbom_code" />
+		<result property="mbomName" column="mbom_name" />
+		<result property="productId" column="product_id" />
+		<result property="productCode" column="product_code" />
+		<result property="productName" column="product_name" />
+		<result property="version" column="version" />
+		<result property="effectiveDate" column="effective_date" />
+		<result property="expireDate" column="expire_date" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomMbomItem" id="MomMbomItemResult">
+		<id property="itemId" column="item_id" />
+		<result property="mbomId" column="mbom_id" />
+		<result property="parentItemId" column="parent_item_id" />
+		<result property="materialId" column="material_id" />
+		<result property="materialCode" column="material_code" />
+		<result property="materialName" column="material_name" />
+		<result property="specModel" column="spec_model" />
+		<result property="unit" column="unit" />
+		<result property="itemSeq" column="item_seq" />
+		<result property="quantity" column="quantity" />
+		<result property="scrapRate" column="scrap_rate" />
+		<result property="operationId" column="operation_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="stepId" column="step_id" />
+		<result property="stepCode" column="step_code" />
+		<result property="issueType" column="issue_type" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<sql id="selectMbomVo">
+		select b.mbom_id, b.mbom_code, b.mbom_name, b.product_id, p.product_code, p.product_name, b.version, b.effective_date, b.expire_date, b.status, b.create_by, b.create_time, b.update_by, b.update_time, b.remark
+		from mom_mbom b left join (
+			select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+		) p on b.product_id = p.product_id
+	</sql>
+
+	<select id="selectMbomList" parameterType="MomMbom" resultMap="MomMbomResult">
+		<include refid="selectMbomVo"/>
+		<where>
+			<if test="mbomCode != null and mbomCode != ''">and b.mbom_code like concat('%', #{mbomCode}, '%')</if>
+			<if test="mbomName != null and mbomName != ''">and b.mbom_name like concat('%', #{mbomName}, '%')</if>
+			<if test="productId != null">and b.product_id = #{productId}</if>
+			<if test="version != null and version != ''">and b.version like concat('%', #{version}, '%')</if>
+			<if test="status != null and status != ''">and b.status = #{status}</if>
+		</where>
+		order by b.mbom_id desc
+	</select>
+
+	<select id="selectMbomById" parameterType="Long" resultMap="MomMbomResult">
+		<include refid="selectMbomVo"/> where b.mbom_id = #{mbomId}
+	</select>
+
+	<select id="selectMbomByCode" parameterType="String" resultMap="MomMbomResult">
+		<include refid="selectMbomVo"/> where b.mbom_code = #{mbomCode}
+	</select>
+
+	<select id="countMbomCode" resultType="int">
+		select count(1) from mom_mbom where mbom_code = #{mbomCode}
+		<if test="mbomId != null">and mbom_id != #{mbomId}</if>
+	</select>
+
+	<select id="countMbomVersion" resultType="int">
+		select count(1) from mom_mbom where product_id = #{productId} and version = #{version}
+		<if test="mbomId != null">and mbom_id != #{mbomId}</if>
+	</select>
+
+	<insert id="insertMbom" parameterType="MomMbom" useGeneratedKeys="true" keyProperty="mbomId">
+		insert into mom_mbom(mbom_code, mbom_name, product_id, version, effective_date, expire_date, status, remark, create_by, create_time)
+		values(#{mbomCode}, #{mbomName}, #{productId}, #{version}, #{effectiveDate}, #{expireDate}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateMbom" parameterType="MomMbom">
+		update mom_mbom
+		<set>
+			<if test="mbomCode != null and mbomCode != ''">mbom_code = #{mbomCode},</if>
+			<if test="mbomName != null and mbomName != ''">mbom_name = #{mbomName},</if>
+			<if test="productId != null">product_id = #{productId},</if>
+			<if test="version != null and version != ''">version = #{version},</if>
+			<if test="effectiveDate != null">effective_date = #{effectiveDate},</if>
+			<if test="expireDate != null">expire_date = #{expireDate},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where mbom_id = #{mbomId}
+	</update>
+
+	<delete id="deleteMbomByIds" parameterType="Long">
+		delete from mom_mbom where mbom_id in
+		<foreach collection="array" item="mbomId" open="(" separator="," close=")">#{mbomId}</foreach>
+	</delete>
+
+	<sql id="selectItemVo">
+		select i.item_id, i.mbom_id, i.parent_item_id, i.material_id, m.material_code, m.material_name, m.spec_model, m.unit, i.item_seq, i.quantity, i.scrap_rate, i.operation_id, o.operation_code, i.step_id, s.step_code, i.issue_type, i.status, i.create_by, i.create_time, i.update_by, i.update_time, i.remark
+		from mom_mbom_item i
+			left join mom_material m on i.material_id = m.material_id
+			left join mom_operation o on i.operation_id = o.operation_id
+			left join mom_work_step s on i.step_id = s.step_id
+	</sql>
+
+	<select id="selectItemList" parameterType="MomMbomItem" resultMap="MomMbomItemResult">
+		<include refid="selectItemVo"/>
+		<where>
+			<if test="mbomId != null">and i.mbom_id = #{mbomId}</if>
+			<if test="parentItemId != null">and i.parent_item_id = #{parentItemId}</if>
+			<if test="materialId != null">and i.material_id = #{materialId}</if>
+			<if test="materialCode != null and materialCode != ''">and m.material_code like concat('%', #{materialCode}, '%')</if>
+			<if test="materialName != null and materialName != ''">and m.material_name like concat('%', #{materialName}, '%')</if>
+			<if test="status != null and status != ''">and i.status = #{status}</if>
+		</where>
+		order by i.parent_item_id, i.item_seq, i.item_id
+	</select>
+
+	<select id="selectItemById" parameterType="Long" resultMap="MomMbomItemResult">
+		<include refid="selectItemVo"/> where i.item_id = #{itemId}
+	</select>
+
+	<select id="countItemSeq" resultType="int">
+		select count(1) from mom_mbom_item where mbom_id = #{mbomId} and parent_item_id = #{parentItemId} and item_seq = #{itemSeq}
+		<if test="itemId != null">and item_id != #{itemId}</if>
+	</select>
+
+	<insert id="insertItem" parameterType="MomMbomItem" useGeneratedKeys="true" keyProperty="itemId">
+		insert into mom_mbom_item(mbom_id, parent_item_id, material_id, item_seq, quantity, scrap_rate, operation_id, step_id, issue_type, status, remark, create_by, create_time)
+		values(#{mbomId}, #{parentItemId}, #{materialId}, #{itemSeq}, #{quantity}, #{scrapRate}, #{operationId}, #{stepId}, #{issueType}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateItem" parameterType="MomMbomItem">
+		update mom_mbom_item
+		<set>
+			<if test="parentItemId != null">parent_item_id = #{parentItemId},</if>
+			<if test="materialId != null">material_id = #{materialId},</if>
+			<if test="itemSeq != null">item_seq = #{itemSeq},</if>
+			<if test="quantity != null">quantity = #{quantity},</if>
+			<if test="scrapRate != null">scrap_rate = #{scrapRate},</if>
+			<if test="operationId != null">operation_id = #{operationId},</if>
+			<if test="stepId != null">step_id = #{stepId},</if>
+			<if test="issueType != null">issue_type = #{issueType},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where item_id = #{itemId}
+	</update>
+
+	<delete id="deleteItemByIds" parameterType="Long">
+		delete from mom_mbom_item where item_id in
+		<foreach collection="array" item="itemId" open="(" separator="," close=")">#{itemId}</foreach>
+	</delete>
+
+	<delete id="deleteItemByMbomIds" parameterType="Long">
+		delete from mom_mbom_item where mbom_id in
+		<foreach collection="array" item="mbomId" open="(" separator="," close=")">#{mbomId}</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mom.mapper.MomBaseMapper">
+
+	<resultMap type="MomMaterial" id="MomMaterialResult">
+		<id property="materialId" column="material_id" />
+		<result property="materialCode" column="material_code" />
+		<result property="materialName" column="material_name" />
+		<result property="specModel" column="spec_model" />
+		<result property="unit" column="unit" />
+		<result property="categoryId" column="category_id" />
+		<result property="categoryName" column="category_name" />
+		<result property="materialType" column="material_type" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomMaterialCategory" id="MomMaterialCategoryResult">
+		<id property="categoryId" column="category_id" />
+		<result property="parentId" column="parent_id" />
+		<result property="ancestors" column="ancestors" />
+		<result property="categoryCode" column="category_code" />
+		<result property="categoryName" column="category_name" />
+		<result property="orderNum" column="order_num" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomProduct" id="MomProductResult">
+		<id property="productId" column="product_id" />
+		<result property="productCode" column="product_code" />
+		<result property="productName" column="product_name" />
+		<result property="materialId" column="material_id" />
+		<result property="materialCode" column="material_code" />
+		<result property="specModel" column="spec_model" />
+		<result property="unit" column="unit" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomResource" id="MomResourceResult">
+		<id property="resourceId" column="resource_id" />
+		<result property="resourceCode" column="resource_code" />
+		<result property="resourceName" column="resource_name" />
+		<result property="resourceType" column="resource_type" />
+		<result property="parentId" column="parent_id" />
+		<result property="workshop" column="workshop" />
+		<result property="lineCode" column="line_code" />
+		<result property="status" column="status" />
+		<result property="stationNoteFlag" column="station_note_flag" />
+		<result property="printBoxFlag" column="print_box_flag" />
+		<result property="printNameplateFlag" column="print_nameplate_flag" />
+		<result property="lineType" column="line_type" />
+		<result property="stationType" column="station_type" />
+		<result property="skillRequire" column="skill_require" />
+		<result property="wipCapacity" column="wip_capacity" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomShiftCalendar" id="MomShiftCalendarResult">
+		<id property="calendarId" column="calendar_id" />
+		<result property="calendarDate" column="calendar_date" />
+		<result property="shiftCode" column="shift_code" />
+		<result property="shiftName" column="shift_name" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="isWorkday" column="is_workday" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomRouting" id="MomRoutingResult">
+		<id property="routingId" column="routing_id" />
+		<result property="routingCode" column="routing_code" />
+		<result property="routingName" column="routing_name" />
+		<result property="productId" column="product_id" />
+		<result property="productCode" column="product_code" />
+		<result property="productName" column="product_name" />
+		<result property="version" column="version" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomOperation" id="MomOperationResult">
+		<id property="operationId" column="operation_id" />
+		<result property="routingId" column="routing_id" />
+		<result property="routingCode" column="routing_code" />
+		<result property="operationCode" column="operation_code" />
+		<result property="operationName" column="operation_name" />
+		<result property="operationSeq" column="operation_seq" />
+		<result property="standardMinutes" column="standard_minutes" />
+		<result property="resourceType" column="resource_type" />
+		<result property="resourceId" column="resource_id" />
+		<result property="resourceCode" column="resource_code" />
+		<result property="resourceName" column="resource_name" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomWorkStep" id="MomWorkStepResult">
+		<id property="stepId" column="step_id" />
+		<result property="operationId" column="operation_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="stepCode" column="step_code" />
+		<result property="stepName" column="step_name" />
+		<result property="stepSeq" column="step_seq" />
+		<result property="standardMinutes" column="standard_minutes" />
+		<result property="isReportPoint" column="is_report_point" />
+		<result property="stepDesc" column="step_desc" />
+		<result property="operationType" column="operation_type" />
+		<result property="screwCheckCount" column="screw_check_count" />
+		<result property="visionProgram" column="vision_program" />
+		<result property="guideTaskId" column="guide_task_id" />
+		<result property="imageUrl" column="image_url" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<sql id="selectMaterialCategoryVo">
+		select category_id, parent_id, ancestors, category_code, category_name, order_num, status, create_by, create_time, update_by, update_time, remark
+		from mom_material_category
+	</sql>
+
+	<select id="selectMaterialCategoryList" parameterType="MomMaterialCategory" resultMap="MomMaterialCategoryResult">
+		<include refid="selectMaterialCategoryVo"/>
+		<where>
+			<if test="categoryCode != null and categoryCode != ''">and category_code like concat('%', #{categoryCode}, '%')</if>
+			<if test="categoryName != null and categoryName != ''">and category_name like concat('%', #{categoryName}, '%')</if>
+			<if test="status != null and status != ''">and status = #{status}</if>
+		</where>
+		order by parent_id, order_num, category_id
+	</select>
+
+	<select id="selectMaterialCategoryById" parameterType="Long" resultMap="MomMaterialCategoryResult">
+		<include refid="selectMaterialCategoryVo"/> where category_id = #{categoryId}
+	</select>
+
+	<select id="selectMaterialCategoryByCode" parameterType="String" resultMap="MomMaterialCategoryResult">
+		<include refid="selectMaterialCategoryVo"/> where category_code = #{categoryCode} and status = '0'
+	</select>
+
+	<select id="selectMaterialCategoryByName" parameterType="String" resultMap="MomMaterialCategoryResult">
+		<include refid="selectMaterialCategoryVo"/> where category_name = #{categoryName} and status = '0'
+	</select>
+
+	<select id="countMaterialCategoryCode" resultType="int">
+		select count(1) from mom_material_category where category_code = #{categoryCode}
+		<if test="categoryId != null">and category_id != #{categoryId}</if>
+	</select>
+
+	<select id="countMaterialByCategoryIds" parameterType="Long" resultType="int">
+		select count(1) from mom_material where category_id in
+		<foreach collection="array" item="categoryId" open="(" separator="," close=")">#{categoryId}</foreach>
+	</select>
+
+	<insert id="insertMaterialCategory" parameterType="MomMaterialCategory" useGeneratedKeys="true" keyProperty="categoryId">
+		insert into mom_material_category(parent_id, ancestors, category_code, category_name, order_num, status, remark, create_by, create_time)
+		values(#{parentId}, #{ancestors}, #{categoryCode}, #{categoryName}, #{orderNum}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateMaterialCategory" parameterType="MomMaterialCategory">
+		update mom_material_category
+		<set>
+			<if test="parentId != null">parent_id = #{parentId},</if>
+			<if test="ancestors != null">ancestors = #{ancestors},</if>
+			<if test="categoryCode != null and categoryCode != ''">category_code = #{categoryCode},</if>
+			<if test="categoryName != null and categoryName != ''">category_name = #{categoryName},</if>
+			<if test="orderNum != null">order_num = #{orderNum},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where category_id = #{categoryId}
+	</update>
+
+	<delete id="deleteMaterialCategoryByIds" parameterType="Long">
+		delete from mom_material_category where category_id in
+		<foreach collection="array" item="categoryId" open="(" separator="," close=")">#{categoryId}</foreach>
+	</delete>
+
+	<sql id="selectMaterialVo">
+		select m.material_id, m.material_code, m.material_name, m.spec_model, m.unit, m.category_id, c.category_name, m.material_type, m.status, m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+		from mom_material m left join mom_material_category c on m.category_id = c.category_id
+	</sql>
+
+	<select id="selectMaterialList" parameterType="MomMaterial" resultMap="MomMaterialResult">
+		<include refid="selectMaterialVo"/>
+		<where>
+			<if test="materialCode != null and materialCode != ''">and m.material_code like concat('%', #{materialCode}, '%')</if>
+			<if test="materialName != null and materialName != ''">and m.material_name like concat('%', #{materialName}, '%')</if>
+			<if test="categoryId != null">and m.category_id = #{categoryId}</if>
+			<if test="materialType != null and materialType != ''">and m.material_type = #{materialType}</if>
+			<if test="status != null and status != ''">and m.status = #{status}</if>
+		</where>
+		order by m.material_id desc
+	</select>
+
+	<select id="selectMaterialAll" resultMap="MomMaterialResult">
+		<include refid="selectMaterialVo"/> where m.status = '0' order by m.material_code
+	</select>
+
+	<select id="selectMaterialById" parameterType="Long" resultMap="MomMaterialResult">
+		<include refid="selectMaterialVo"/> where m.material_id = #{materialId}
+	</select>
+
+	<select id="selectMaterialByCode" parameterType="String" resultMap="MomMaterialResult">
+		<include refid="selectMaterialVo"/> where m.material_code = #{materialCode}
+	</select>
+
+	<select id="countMaterialCode" resultType="int">
+		select count(1) from mom_material where material_code = #{materialCode}
+		<if test="materialId != null">and material_id != #{materialId}</if>
+	</select>
+
+	<insert id="insertMaterial" parameterType="MomMaterial" useGeneratedKeys="true" keyProperty="materialId">
+		insert into mom_material(material_code, material_name, spec_model, unit, category_id, material_type, status, remark, create_by, create_time)
+		values(#{materialCode}, #{materialName}, #{specModel}, #{unit}, #{categoryId}, #{materialType}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateMaterial" parameterType="MomMaterial">
+		update mom_material
+		<set>
+			<if test="materialCode != null and materialCode != ''">material_code = #{materialCode},</if>
+			<if test="materialName != null and materialName != ''">material_name = #{materialName},</if>
+			<if test="specModel != null">spec_model = #{specModel},</if>
+			<if test="unit != null">unit = #{unit},</if>
+			<if test="categoryId != null">category_id = #{categoryId},</if>
+			<if test="materialType != null">material_type = #{materialType},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where material_id = #{materialId}
+	</update>
+
+	<delete id="deleteMaterialByIds" parameterType="Long">
+		delete from mom_material where material_id in
+		<foreach collection="array" item="materialId" open="(" separator="," close=")">#{materialId}</foreach>
+	</delete>
+
+	<sql id="selectProductVo">
+		select m.material_id product_id, m.material_code product_code, m.material_name product_name, m.material_id, m.material_code,
+		       m.spec_model, m.unit, m.status, m.create_by, m.create_time, m.update_by, m.update_time, m.remark
+		from mom_material m
+	</sql>
+
+	<select id="selectProductList" parameterType="MomProduct" resultMap="MomProductResult">
+		<include refid="selectProductVo"/>
+		<where>
+			and (m.material_type = 'product' or m.category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+			<if test="productCode != null and productCode != ''">and m.material_code like concat('%', #{productCode}, '%')</if>
+			<if test="productName != null and productName != ''">and m.material_name like concat('%', #{productName}, '%')</if>
+			<if test="status != null and status != ''">and m.status = #{status}</if>
+		</where>
+		order by m.material_id desc
+	</select>
+
+	<select id="selectProductAll" resultMap="MomProductResult">
+		<include refid="selectProductVo"/> where (m.material_type = 'product' or m.category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品')) and m.status = '0' order by m.material_code
+	</select>
+
+	<select id="selectProductById" parameterType="Long" resultMap="MomProductResult">
+		<include refid="selectProductVo"/> where (m.material_type = 'product' or m.category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品')) and m.material_id = #{productId}
+	</select>
+
+	<select id="selectProductByCode" parameterType="String" resultMap="MomProductResult">
+		<include refid="selectProductVo"/> where (m.material_type = 'product' or m.category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品')) and m.material_code = #{productCode}
+	</select>
+
+	<select id="countProductCode" resultType="int">
+		select count(1) from mom_product where product_code = #{productCode}
+		<if test="productId != null">and product_id != #{productId}</if>
+	</select>
+
+	<insert id="insertProduct" parameterType="MomProduct" useGeneratedKeys="true" keyProperty="productId">
+		insert into mom_product(product_code, product_name, material_id, spec_model, unit, status, remark, create_by, create_time)
+		values(#{productCode}, #{productName}, #{materialId}, #{specModel}, #{unit}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateProduct" parameterType="MomProduct">
+		update mom_product
+		<set>
+			<if test="productCode != null and productCode != ''">product_code = #{productCode},</if>
+			<if test="productName != null and productName != ''">product_name = #{productName},</if>
+			<if test="materialId != null">material_id = #{materialId},</if>
+			<if test="specModel != null">spec_model = #{specModel},</if>
+			<if test="unit != null">unit = #{unit},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where product_id = #{productId}
+	</update>
+
+	<delete id="deleteProductByIds" parameterType="Long">
+		delete from mom_product where product_id in
+		<foreach collection="array" item="productId" open="(" separator="," close=")">#{productId}</foreach>
+	</delete>
+
+	<sql id="selectResourceVo">
+		select resource_id, resource_code, resource_name, resource_type, parent_id, workshop, line_code, status,
+		       station_note_flag, print_box_flag, print_nameplate_flag, line_type, station_type, skill_require, wip_capacity,
+		       create_by, create_time, update_by, update_time, remark
+		from mom_resource
+	</sql>
+
+	<select id="selectResourceList" parameterType="MomResource" resultMap="MomResourceResult">
+		<include refid="selectResourceVo"/>
+		<where>
+			<if test="resourceCode != null and resourceCode != ''">and resource_code like concat('%', #{resourceCode}, '%')</if>
+			<if test="resourceName != null and resourceName != ''">and resource_name like concat('%', #{resourceName}, '%')</if>
+			<if test="resourceType != null and resourceType != ''">and resource_type = #{resourceType}</if>
+			<if test="status != null and status != ''">and status = #{status}</if>
+		</where>
+		order by resource_id desc
+	</select>
+
+	<select id="selectResourceAll" resultMap="MomResourceResult">
+		<include refid="selectResourceVo"/> where status = '0' order by resource_code
+	</select>
+
+	<select id="selectResourceById" parameterType="Long" resultMap="MomResourceResult">
+		<include refid="selectResourceVo"/> where resource_id = #{resourceId}
+	</select>
+
+	<select id="selectResourceByCode" parameterType="String" resultMap="MomResourceResult">
+		<include refid="selectResourceVo"/> where resource_code = #{resourceCode}
+	</select>
+
+	<select id="countResourceCode" resultType="int">
+		select count(1) from mom_resource where resource_code = #{resourceCode}
+		<if test="resourceId != null">and resource_id != #{resourceId}</if>
+	</select>
+
+	<insert id="insertResource" parameterType="MomResource" useGeneratedKeys="true" keyProperty="resourceId">
+		insert into mom_resource(resource_code, resource_name, resource_type, parent_id, workshop, line_code, status,
+		                         station_note_flag, print_box_flag, print_nameplate_flag, line_type, station_type, skill_require, wip_capacity,
+		                         remark, create_by, create_time)
+		values(#{resourceCode}, #{resourceName}, #{resourceType}, #{parentId}, #{workshop}, #{lineCode}, #{status},
+		       #{stationNoteFlag}, #{printBoxFlag}, #{printNameplateFlag}, #{lineType}, #{stationType}, #{skillRequire}, #{wipCapacity},
+		       #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateResource" parameterType="MomResource">
+		update mom_resource
+		<set>
+			<if test="resourceCode != null and resourceCode != ''">resource_code = #{resourceCode},</if>
+			<if test="resourceName != null and resourceName != ''">resource_name = #{resourceName},</if>
+			<if test="resourceType != null">resource_type = #{resourceType},</if>
+			<if test="parentId != null">parent_id = #{parentId},</if>
+			<if test="workshop != null">workshop = #{workshop},</if>
+			<if test="lineCode != null">line_code = #{lineCode},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="stationNoteFlag != null">station_note_flag = #{stationNoteFlag},</if>
+			<if test="printBoxFlag != null">print_box_flag = #{printBoxFlag},</if>
+			<if test="printNameplateFlag != null">print_nameplate_flag = #{printNameplateFlag},</if>
+			<if test="lineType != null">line_type = #{lineType},</if>
+			<if test="stationType != null">station_type = #{stationType},</if>
+			<if test="skillRequire != null">skill_require = #{skillRequire},</if>
+			<if test="wipCapacity != null">wip_capacity = #{wipCapacity},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where resource_id = #{resourceId}
+	</update>
+
+	<delete id="deleteResourceByIds" parameterType="Long">
+		delete from mom_resource where resource_id in
+		<foreach collection="array" item="resourceId" open="(" separator="," close=")">#{resourceId}</foreach>
+	</delete>
+
+	<sql id="selectCalendarVo">
+		select calendar_id, calendar_date, shift_code, shift_name, start_time, end_time, is_workday, status, create_by, create_time, update_by, update_time, remark
+		from mom_shift_calendar
+	</sql>
+
+	<select id="selectCalendarList" parameterType="MomShiftCalendar" resultMap="MomShiftCalendarResult">
+		<include refid="selectCalendarVo"/>
+		<where>
+			<if test="calendarDate != null">and calendar_date = #{calendarDate}</if>
+			<if test="shiftCode != null and shiftCode != ''">and shift_code like concat('%', #{shiftCode}, '%')</if>
+			<if test="shiftName != null and shiftName != ''">and shift_name like concat('%', #{shiftName}, '%')</if>
+			<if test="isWorkday != null and isWorkday != ''">and is_workday = #{isWorkday}</if>
+			<if test="status != null and status != ''">and status = #{status}</if>
+		</where>
+		order by calendar_date desc, shift_code
+	</select>
+
+	<select id="selectCalendarById" parameterType="Long" resultMap="MomShiftCalendarResult">
+		<include refid="selectCalendarVo"/> where calendar_id = #{calendarId}
+	</select>
+
+	<select id="countCalendarShift" resultType="int">
+		select count(1) from mom_shift_calendar where calendar_date = #{calendarDate} and shift_code = #{shiftCode}
+		<if test="calendarId != null">and calendar_id != #{calendarId}</if>
+	</select>
+
+	<insert id="insertCalendar" parameterType="MomShiftCalendar" useGeneratedKeys="true" keyProperty="calendarId">
+		insert into mom_shift_calendar(calendar_date, shift_code, shift_name, start_time, end_time, is_workday, status, remark, create_by, create_time)
+		values(#{calendarDate}, #{shiftCode}, #{shiftName}, #{startTime}, #{endTime}, #{isWorkday}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateCalendar" parameterType="MomShiftCalendar">
+		update mom_shift_calendar
+		<set>
+			<if test="calendarDate != null">calendar_date = #{calendarDate},</if>
+			<if test="shiftCode != null and shiftCode != ''">shift_code = #{shiftCode},</if>
+			<if test="shiftName != null and shiftName != ''">shift_name = #{shiftName},</if>
+			<if test="startTime != null">start_time = #{startTime},</if>
+			<if test="endTime != null">end_time = #{endTime},</if>
+			<if test="isWorkday != null and isWorkday != ''">is_workday = #{isWorkday},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where calendar_id = #{calendarId}
+	</update>
+
+	<delete id="deleteCalendarByIds" parameterType="Long">
+		delete from mom_shift_calendar where calendar_id in
+		<foreach collection="array" item="calendarId" open="(" separator="," close=")">#{calendarId}</foreach>
+	</delete>
+
+	<sql id="selectRoutingVo">
+		select r.routing_id, r.routing_code, r.routing_name, r.product_id, p.product_code, p.product_name, r.version, r.status, r.create_by, r.create_time, r.update_by, r.update_time, r.remark
+		from mom_routing r left join (
+			select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+		) p on r.product_id = p.product_id
+	</sql>
+
+	<select id="selectRoutingList" parameterType="MomRouting" resultMap="MomRoutingResult">
+		<include refid="selectRoutingVo"/>
+		<where>
+			<if test="routingCode != null and routingCode != ''">and r.routing_code like concat('%', #{routingCode}, '%')</if>
+			<if test="routingName != null and routingName != ''">and r.routing_name like concat('%', #{routingName}, '%')</if>
+			<if test="productId != null">and r.product_id = #{productId}</if>
+			<if test="version != null and version != ''">and r.version like concat('%', #{version}, '%')</if>
+			<if test="status != null and status != ''">and r.status = #{status}</if>
+		</where>
+		order by r.routing_id desc
+	</select>
+
+	<select id="selectRoutingById" parameterType="Long" resultMap="MomRoutingResult">
+		<include refid="selectRoutingVo"/> where r.routing_id = #{routingId}
+	</select>
+
+	<select id="selectRoutingByCode" parameterType="String" resultMap="MomRoutingResult">
+		<include refid="selectRoutingVo"/> where r.routing_code = #{routingCode}
+	</select>
+
+	<select id="countRoutingCode" resultType="int">
+		select count(1) from mom_routing where routing_code = #{routingCode}
+		<if test="routingId != null">and routing_id != #{routingId}</if>
+	</select>
+
+	<select id="countRoutingVersion" resultType="int">
+		select count(1) from mom_routing where product_id = #{productId} and version = #{version}
+		<if test="routingId != null">and routing_id != #{routingId}</if>
+	</select>
+
+	<insert id="insertRouting" parameterType="MomRouting" useGeneratedKeys="true" keyProperty="routingId">
+		insert into mom_routing(routing_code, routing_name, product_id, version, status, remark, create_by, create_time)
+		values(#{routingCode}, #{routingName}, #{productId}, #{version}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateRouting" parameterType="MomRouting">
+		update mom_routing
+		<set>
+			<if test="routingCode != null and routingCode != ''">routing_code = #{routingCode},</if>
+			<if test="routingName != null and routingName != ''">routing_name = #{routingName},</if>
+			<if test="productId != null">product_id = #{productId},</if>
+			<if test="version != null and version != ''">version = #{version},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where routing_id = #{routingId}
+	</update>
+
+	<delete id="deleteRoutingByIds" parameterType="Long">
+		delete from mom_routing where routing_id in
+		<foreach collection="array" item="routingId" open="(" separator="," close=")">#{routingId}</foreach>
+	</delete>
+
+	<sql id="selectOperationVo">
+		select o.operation_id, o.routing_id, r.routing_code, o.operation_code, o.operation_name, o.operation_seq, o.standard_minutes,
+			o.resource_type, o.resource_id, res.resource_code, res.resource_name, o.status, o.create_by, o.create_time, o.update_by, o.update_time, o.remark
+		from mom_operation o left join mom_routing r on o.routing_id = r.routing_id
+			left join mom_resource res on o.resource_id = res.resource_id
+	</sql>
+
+	<select id="selectOperationList" parameterType="MomOperation" resultMap="MomOperationResult">
+		<include refid="selectOperationVo"/>
+		<where>
+			<if test="routingId != null">and o.routing_id = #{routingId}</if>
+			<if test="operationCode != null and operationCode != ''">and o.operation_code like concat('%', #{operationCode}, '%')</if>
+			<if test="operationName != null and operationName != ''">and o.operation_name like concat('%', #{operationName}, '%')</if>
+			<if test="status != null and status != ''">and o.status = #{status}</if>
+		</where>
+		order by o.routing_id, o.operation_seq, o.operation_id
+	</select>
+
+	<select id="selectOperationById" parameterType="Long" resultMap="MomOperationResult">
+		<include refid="selectOperationVo"/> where o.operation_id = #{operationId}
+	</select>
+
+	<select id="countOperationCode" resultType="int">
+		select count(1) from mom_operation where routing_id = #{routingId} and operation_code = #{operationCode}
+		<if test="operationId != null">and operation_id != #{operationId}</if>
+	</select>
+
+	<select id="countOperationSeq" resultType="int">
+		select count(1) from mom_operation where routing_id = #{routingId} and operation_seq = #{operationSeq}
+		<if test="operationId != null">and operation_id != #{operationId}</if>
+	</select>
+
+	<insert id="insertOperation" parameterType="MomOperation" useGeneratedKeys="true" keyProperty="operationId">
+		insert into mom_operation(routing_id, operation_code, operation_name, operation_seq, standard_minutes, resource_type, resource_id, status, remark, create_by, create_time)
+		values(#{routingId}, #{operationCode}, #{operationName}, #{operationSeq}, #{standardMinutes}, #{resourceType}, #{resourceId}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateOperation" parameterType="MomOperation">
+		update mom_operation
+		<set>
+			<if test="routingId != null">routing_id = #{routingId},</if>
+			<if test="operationCode != null and operationCode != ''">operation_code = #{operationCode},</if>
+			<if test="operationName != null and operationName != ''">operation_name = #{operationName},</if>
+			<if test="operationSeq != null">operation_seq = #{operationSeq},</if>
+			<if test="standardMinutes != null">standard_minutes = #{standardMinutes},</if>
+			<if test="resourceType != null">resource_type = #{resourceType},</if>
+			<if test="resourceId != null">resource_id = #{resourceId},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where operation_id = #{operationId}
+	</update>
+
+	<delete id="deleteOperationByIds" parameterType="Long">
+		delete from mom_operation where operation_id in
+		<foreach collection="array" item="operationId" open="(" separator="," close=")">#{operationId}</foreach>
+	</delete>
+
+	<delete id="deleteOperationByRoutingIds" parameterType="Long">
+		delete from mom_operation where routing_id in
+		<foreach collection="array" item="routingId" open="(" separator="," close=")">#{routingId}</foreach>
+	</delete>
+
+	<sql id="selectStepVo">
+		select s.step_id, s.operation_id, o.operation_code, s.step_code, s.step_name, s.step_seq, s.standard_minutes, s.is_report_point,
+			s.step_desc, s.operation_type, s.screw_check_count, s.vision_program, s.guide_task_id, s.image_url,
+			s.status, s.create_by, s.create_time, s.update_by, s.update_time, s.remark
+		from mom_work_step s left join mom_operation o on s.operation_id = o.operation_id
+	</sql>
+
+	<select id="selectStepList" parameterType="MomWorkStep" resultMap="MomWorkStepResult">
+		<include refid="selectStepVo"/>
+		<where>
+			<if test="operationId != null">and s.operation_id = #{operationId}</if>
+			<if test="stepCode != null and stepCode != ''">and s.step_code like concat('%', #{stepCode}, '%')</if>
+			<if test="stepName != null and stepName != ''">and s.step_name like concat('%', #{stepName}, '%')</if>
+			<if test="status != null and status != ''">and s.status = #{status}</if>
+		</where>
+		order by s.operation_id, s.step_seq, s.step_id
+	</select>
+
+	<select id="selectStepById" parameterType="Long" resultMap="MomWorkStepResult">
+		<include refid="selectStepVo"/> where s.step_id = #{stepId}
+	</select>
+
+	<select id="countStepCode" resultType="int">
+		select count(1) from mom_work_step where operation_id = #{operationId} and step_code = #{stepCode}
+		<if test="stepId != null">and step_id != #{stepId}</if>
+	</select>
+
+	<select id="countStepSeq" resultType="int">
+		select count(1) from mom_work_step where operation_id = #{operationId} and step_seq = #{stepSeq}
+		<if test="stepId != null">and step_id != #{stepId}</if>
+	</select>
+
+	<insert id="insertStep" parameterType="MomWorkStep" useGeneratedKeys="true" keyProperty="stepId">
+		insert into mom_work_step(operation_id, step_code, step_name, step_seq, standard_minutes, is_report_point, step_desc, operation_type, screw_check_count, vision_program, guide_task_id, image_url, status, remark, create_by, create_time)
+		values(#{operationId}, #{stepCode}, #{stepName}, #{stepSeq}, #{standardMinutes}, #{isReportPoint}, #{stepDesc}, #{operationType}, #{screwCheckCount}, #{visionProgram}, #{guideTaskId}, #{imageUrl}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateStep" parameterType="MomWorkStep">
+		update mom_work_step
+		<set>
+			<if test="operationId != null">operation_id = #{operationId},</if>
+			<if test="stepCode != null and stepCode != ''">step_code = #{stepCode},</if>
+			<if test="stepName != null and stepName != ''">step_name = #{stepName},</if>
+			<if test="stepSeq != null">step_seq = #{stepSeq},</if>
+			<if test="standardMinutes != null">standard_minutes = #{standardMinutes},</if>
+			<if test="isReportPoint != null and isReportPoint != ''">is_report_point = #{isReportPoint},</if>
+			<if test="stepDesc != null">step_desc = #{stepDesc},</if>
+			<if test="operationType != null">operation_type = #{operationType},</if>
+			<if test="screwCheckCount != null">screw_check_count = #{screwCheckCount},</if>
+			<if test="visionProgram != null">vision_program = #{visionProgram},</if>
+			<if test="guideTaskId != null">guide_task_id = #{guideTaskId},</if>
+			<if test="imageUrl != null">image_url = #{imageUrl},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where step_id = #{stepId}
+	</update>
+
+	<delete id="deleteStepByIds" parameterType="Long">
+		delete from mom_work_step where step_id in
+		<foreach collection="array" item="stepId" open="(" separator="," close=")">#{stepId}</foreach>
+	</delete>
+
+	<delete id="deleteStepByOperationIds" parameterType="Long">
+		delete from mom_work_step where operation_id in
+		<foreach collection="array" item="operationId" open="(" separator="," close=")">#{operationId}</foreach>
+	</delete>
+
+	<delete id="deleteStepByRoutingIds" parameterType="Long">
+		delete from mom_work_step where operation_id in (
+			select operation_id from mom_operation where routing_id in
+			<foreach collection="array" item="routingId" open="(" separator="," close=")">#{routingId}</foreach>
+		)
+	</delete>
+
+</mapper>

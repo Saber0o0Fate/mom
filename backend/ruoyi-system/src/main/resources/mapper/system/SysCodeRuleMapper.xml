@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SysCodeRuleMapper">
+
+    <resultMap type="SysCodeRule" id="SysCodeRuleResult">
+        <id property="ruleId" column="rule_id" />
+        <result property="ruleCode" column="rule_code" />
+        <result property="ruleName" column="rule_name" />
+        <result property="prefix" column="prefix" />
+        <result property="dateFormat" column="date_format" />
+        <result property="serialLength" column="serial_length" />
+        <result property="separator" column="separator" />
+        <result property="resetPeriod" column="reset_period" />
+        <result property="currentSerial" column="current_serial" />
+        <result property="lastGenerateTime" column="last_generate_time" />
+        <result property="status" column="status" />
+        <result property="createBy" column="create_by" />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy" column="update_by" />
+        <result property="updateTime" column="update_time" />
+        <result property="remark" column="remark" />
+    </resultMap>
+
+    <sql id="selectCodeRuleVo">
+        select rule_id, rule_code, rule_name, prefix, date_format, serial_length, separator, reset_period,
+               current_serial, last_generate_time, status, create_by, create_time, update_by, update_time, remark
+        from sys_code_rule
+    </sql>
+
+    <select id="selectCodeRuleList" parameterType="SysCodeRule" resultMap="SysCodeRuleResult">
+        <include refid="selectCodeRuleVo"/>
+        <where>
+            <if test="ruleCode != null and ruleCode != ''">and rule_code like concat('%', #{ruleCode}, '%')</if>
+            <if test="ruleName != null and ruleName != ''">and rule_name like concat('%', #{ruleName}, '%')</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+        </where>
+        order by rule_id desc
+    </select>
+
+    <select id="selectCodeRuleById" parameterType="Long" resultMap="SysCodeRuleResult">
+        <include refid="selectCodeRuleVo"/> where rule_id = #{ruleId}
+    </select>
+
+    <select id="selectCodeRuleByCode" parameterType="String" resultMap="SysCodeRuleResult">
+        <include refid="selectCodeRuleVo"/> where rule_code = #{ruleCode} limit 1
+    </select>
+
+    <select id="countRuleCode" resultType="int">
+        select count(1) from sys_code_rule where rule_code = #{ruleCode}
+        <if test="ruleId != null">and rule_id != #{ruleId}</if>
+    </select>
+
+    <insert id="insertCodeRule" parameterType="SysCodeRule" useGeneratedKeys="true" keyProperty="ruleId">
+        insert into sys_code_rule(rule_code, rule_name, prefix, date_format, serial_length, separator, reset_period,
+                                  current_serial, last_generate_time, status, create_by, create_time, remark)
+        values(#{ruleCode}, #{ruleName}, #{prefix}, #{dateFormat}, #{serialLength}, #{separator}, #{resetPeriod},
+               #{currentSerial}, #{lastGenerateTime}, #{status}, #{createBy}, CURRENT_TIMESTAMP, #{remark})
+    </insert>
+
+    <update id="updateCodeRule" parameterType="SysCodeRule">
+        update sys_code_rule
+        <set>
+            <if test="ruleCode != null and ruleCode != ''">rule_code = #{ruleCode},</if>
+            <if test="ruleName != null and ruleName != ''">rule_name = #{ruleName},</if>
+            <if test="prefix != null">prefix = #{prefix},</if>
+            <if test="dateFormat != null">date_format = #{dateFormat},</if>
+            <if test="serialLength != null">serial_length = #{serialLength},</if>
+            <if test="separator != null">separator = #{separator},</if>
+            <if test="resetPeriod != null and resetPeriod != ''">reset_period = #{resetPeriod},</if>
+            <if test="currentSerial != null">current_serial = #{currentSerial},</if>
+            <if test="lastGenerateTime != null">last_generate_time = #{lastGenerateTime},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        where rule_id = #{ruleId}
+    </update>
+
+    <update id="resetCodeRule" parameterType="Long">
+        update sys_code_rule set current_serial = 0, last_generate_time = null, update_time = CURRENT_TIMESTAMP where rule_id = #{ruleId}
+    </update>
+
+    <delete id="deleteCodeRuleByIds" parameterType="Long">
+        delete from sys_code_rule where rule_id in
+        <foreach collection="array" item="ruleId" open="(" separator="," close=")">#{ruleId}</foreach>
+    </delete>
+
+    <insert id="insertCodeRuleRecord">
+        insert into sys_code_rule_record(rule_code, generated_code, create_time)
+        values(#{ruleCode}, #{generatedCode}, CURRENT_TIMESTAMP)
+    </insert>
+</mapper>

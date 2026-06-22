@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mom.mapper.MomConsoleMapper">
+
+	<select id="selectPbomList" parameterType="map" resultType="map">
+		select b.pbom_id pbomId, b.pbom_code pbomCode, b.pbom_name pbomName, b.product_id productId,
+			p.product_code productCode, p.product_name productName, b.version, b.status,
+			b.create_by createBy, b.create_time createTime, b.update_by updateBy, b.update_time updateTime, b.remark
+		from mom_pbom b left join (
+			select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+		) p on b.product_id = p.product_id
+		<where>
+			<if test="pbomCode != null and pbomCode != ''">and b.pbom_code like concat('%', #{pbomCode}, '%')</if>
+			<if test="pbomName != null and pbomName != ''">and b.pbom_name like concat('%', #{pbomName}, '%')</if>
+			<if test="productId != null and productId != ''">and b.product_id = #{productId}</if>
+			<if test="status != null and status != ''">and b.status = #{status}</if>
+		</where>
+		order by b.pbom_id desc
+	</select>
+
+	<select id="selectPbomById" parameterType="Long" resultType="map">
+		select b.pbom_id pbomId, b.pbom_code pbomCode, b.pbom_name pbomName, b.product_id productId,
+			p.product_code productCode, p.product_name productName, b.version, b.status, b.remark
+		from mom_pbom b left join (
+			select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+		) p on b.product_id = p.product_id
+		where b.pbom_id = #{pbomId}
+	</select>
+
+	<select id="selectPbomByCode" parameterType="String" resultType="map">
+		select b.pbom_id pbomId, b.pbom_code pbomCode, b.pbom_name pbomName, b.product_id productId,
+			p.product_code productCode, p.product_name productName, b.version, b.status, b.remark
+		from mom_pbom b left join (
+			select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+		) p on b.product_id = p.product_id
+		where b.pbom_code = #{pbomCode}
+	</select>
+
+	<select id="countPbomCode" resultType="int">
+		select count(1) from mom_pbom where pbom_code = #{pbomCode}
+		<if test="pbomId != null">and pbom_id != #{pbomId}</if>
+	</select>
+
+	<insert id="insertPbom" parameterType="map" useGeneratedKeys="true" keyProperty="pbomId">
+		insert into mom_pbom(pbom_code, pbom_name, product_id, version, status, remark, create_by, create_time)
+		values(#{pbomCode}, #{pbomName}, #{productId}, #{version}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updatePbom" parameterType="map">
+		update mom_pbom
+		<set>
+			<if test="pbomCode != null and pbomCode != ''">pbom_code = #{pbomCode},</if>
+			<if test="pbomName != null and pbomName != ''">pbom_name = #{pbomName},</if>
+			<if test="productId != null">product_id = #{productId},</if>
+			<if test="version != null">version = #{version},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where pbom_id = #{pbomId}
+	</update>
+
+	<delete id="deletePbomByIds" parameterType="Long">
+		delete from mom_pbom where pbom_id in
+		<foreach collection="array" item="pbomId" open="(" separator="," close=")">#{pbomId}</foreach>
+	</delete>
+
+	<select id="selectPbomItems" parameterType="Long" resultType="map">
+		select i.item_id itemId, i.pbom_id pbomId, i.parent_item_id parentItemId, i.material_id materialId,
+			m.material_code materialCode, m.material_name materialName, m.spec_model specModel, m.unit,
+			i.resource_id resourceId, r.resource_code resourceCode, r.resource_name resourceName,
+			i.item_seq itemSeq, i.quantity, i.status, i.remark
+		from mom_pbom_item i left join mom_material m on i.material_id = m.material_id
+			left join mom_resource r on i.resource_id = r.resource_id
+		where i.pbom_id = #{pbomId}
+		order by i.parent_item_id, i.item_seq, i.item_id
+	</select>
+
+	<insert id="insertPbomItem" parameterType="map" useGeneratedKeys="true" keyProperty="itemId">
+		insert into mom_pbom_item(pbom_id, parent_item_id, material_id, resource_id, item_seq, quantity, status, remark, create_by, create_time)
+		values(#{pbomId}, #{parentItemId}, #{materialId}, #{resourceId}, #{itemSeq}, #{quantity}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updatePbomItem" parameterType="map">
+		update mom_pbom_item
+		<set>
+			<if test="parentItemId != null">parent_item_id = #{parentItemId},</if>
+			<if test="materialId != null">material_id = #{materialId},</if>
+			<if test="resourceId != null">resource_id = #{resourceId},</if>
+			<if test="itemSeq != null">item_seq = #{itemSeq},</if>
+			<if test="quantity != null">quantity = #{quantity},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where item_id = #{itemId}
+	</update>
+
+	<delete id="deletePbomItemByIds" parameterType="Long">
+		delete from mom_pbom_item where item_id in
+		<foreach collection="array" item="itemId" open="(" separator="," close=")">#{itemId}</foreach>
+	</delete>
+
+	<delete id="deletePbomItemByPbomIds" parameterType="Long">
+		delete from mom_pbom_item where pbom_id in
+		<foreach collection="array" item="pbomId" open="(" separator="," close=")">#{pbomId}</foreach>
+	</delete>
+
+	<select id="selectTrayList" parameterType="map" resultType="map">
+		select t.tray_id trayId, t.tray_code trayCode, t.tray_name trayName, t.tray_type trayType,
+			t.resource_id resourceId, r.resource_name resourceName, t.status, t.create_time createTime, t.remark
+		from mom_tray t left join mom_resource r on t.resource_id = r.resource_id
+		<where>
+			<if test="trayCode != null and trayCode != ''">and t.tray_code like concat('%', #{trayCode}, '%')</if>
+			<if test="trayName != null and trayName != ''">and t.tray_name like concat('%', #{trayName}, '%')</if>
+			<if test="resourceId != null and resourceId != ''">and t.resource_id = #{resourceId}</if>
+			<if test="status != null and status != ''">and t.status = #{status}</if>
+		</where>
+		order by t.tray_id desc
+	</select>
+
+	<select id="countTrayCode" resultType="int">
+		select count(1) from mom_tray where tray_code = #{trayCode}
+		<if test="trayId != null">and tray_id != #{trayId}</if>
+	</select>
+
+	<insert id="insertTray" parameterType="map" useGeneratedKeys="true" keyProperty="trayId">
+		insert into mom_tray(tray_code, tray_name, tray_type, resource_id, status, remark, create_by, create_time)
+		values(#{trayCode}, #{trayName}, #{trayType}, #{resourceId}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateTray" parameterType="map">
+		update mom_tray
+		<set>
+			<if test="trayCode != null and trayCode != ''">tray_code = #{trayCode},</if>
+			<if test="trayName != null">tray_name = #{trayName},</if>
+			<if test="trayType != null">tray_type = #{trayType},</if>
+			<if test="resourceId != null">resource_id = #{resourceId},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where tray_id = #{trayId}
+	</update>
+
+	<delete id="deleteTrayByIds" parameterType="Long">
+		delete from mom_tray where tray_id in
+		<foreach collection="array" item="trayId" open="(" separator="," close=")">#{trayId}</foreach>
+	</delete>
+
+	<select id="selectTrayItems" parameterType="Long" resultType="map">
+		select i.item_id itemId, i.tray_id trayId, i.material_id materialId, m.material_code materialCode,
+			m.material_name materialName, i.location_code locationCode, i.quantity, i.status, i.remark
+		from mom_tray_item i left join mom_material m on i.material_id = m.material_id
+		where i.tray_id = #{trayId}
+		order by i.location_code, i.item_id
+	</select>
+
+	<insert id="insertTrayItem" parameterType="map" useGeneratedKeys="true" keyProperty="itemId">
+		insert into mom_tray_item(tray_id, material_id, location_code, quantity, status, remark, create_by, create_time)
+		values(#{trayId}, #{materialId}, #{locationCode}, #{quantity}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateTrayItem" parameterType="map">
+		update mom_tray_item
+		<set>
+			<if test="materialId != null">material_id = #{materialId},</if>
+			<if test="locationCode != null">location_code = #{locationCode},</if>
+			<if test="quantity != null">quantity = #{quantity},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where item_id = #{itemId}
+	</update>
+
+	<delete id="deleteTrayItemByIds" parameterType="Long">
+		delete from mom_tray_item where item_id in
+		<foreach collection="array" item="itemId" open="(" separator="," close=")">#{itemId}</foreach>
+	</delete>
+
+	<delete id="deleteTrayItemByTrayIds" parameterType="Long">
+		delete from mom_tray_item where tray_id in
+		<foreach collection="array" item="trayId" open="(" separator="," close=")">#{trayId}</foreach>
+	</delete>
+
+	<select id="selectDeviceCategoryList" parameterType="map" resultType="map">
+		select category_id categoryId, category_code categoryCode, category_name categoryName, device_type deviceType,
+			status, create_time createTime, remark
+		from mom_device_category
+		<where>
+			<if test="categoryCode != null and categoryCode != ''">and category_code like concat('%', #{categoryCode}, '%')</if>
+			<if test="categoryName != null and categoryName != ''">and category_name like concat('%', #{categoryName}, '%')</if>
+			<if test="deviceType != null and deviceType != ''">and device_type = #{deviceType}</if>
+			<if test="status != null and status != ''">and status = #{status}</if>
+		</where>
+		order by category_id desc
+	</select>
+
+	<select id="countDeviceCategoryCode" resultType="int">
+		select count(1) from mom_device_category where category_code = #{categoryCode}
+		<if test="categoryId != null">and category_id != #{categoryId}</if>
+	</select>
+
+	<insert id="insertDeviceCategory" parameterType="map" useGeneratedKeys="true" keyProperty="categoryId">
+		insert into mom_device_category(category_code, category_name, device_type, status, remark, create_by, create_time)
+		values(#{categoryCode}, #{categoryName}, #{deviceType}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateDeviceCategory" parameterType="map">
+		update mom_device_category
+		<set>
+			<if test="categoryCode != null and categoryCode != ''">category_code = #{categoryCode},</if>
+			<if test="categoryName != null">category_name = #{categoryName},</if>
+			<if test="deviceType != null">device_type = #{deviceType},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where category_id = #{categoryId}
+	</update>
+
+	<delete id="deleteDeviceCategoryByIds" parameterType="Long">
+		delete from mom_device_category where category_id in
+		<foreach collection="array" item="categoryId" open="(" separator="," close=")">#{categoryId}</foreach>
+	</delete>
+
+	<select id="selectDeviceList" parameterType="map" resultType="map">
+		select d.device_id deviceId, d.device_code deviceCode, d.device_name deviceName, d.category_id categoryId,
+			c.category_name categoryName, c.device_type deviceType, d.resource_id resourceId, r.resource_name resourceName,
+			d.ip_address ipAddress, d.port, d.status, d.runtime_data runtimeData, d.last_connect_time lastConnectTime, d.remark
+		from mom_device d
+			left join mom_device_category c on d.category_id = c.category_id
+			left join mom_resource r on d.resource_id = r.resource_id
+		<where>
+			<if test="deviceCode != null and deviceCode != ''">and d.device_code like concat('%', #{deviceCode}, '%')</if>
+			<if test="deviceName != null and deviceName != ''">and d.device_name like concat('%', #{deviceName}, '%')</if>
+			<if test="deviceType != null and deviceType != ''">and c.device_type = #{deviceType}</if>
+			<if test="resourceId != null and resourceId != ''">and d.resource_id = #{resourceId}</if>
+			<if test="status != null and status != ''">and d.status = #{status}</if>
+		</where>
+		order by d.device_id desc
+	</select>
+
+	<select id="selectDeviceById" parameterType="Long" resultType="map">
+		select d.device_id deviceId, d.device_code deviceCode, d.device_name deviceName, d.category_id categoryId,
+			c.category_name categoryName, c.device_type deviceType, d.resource_id resourceId, r.resource_name resourceName,
+			d.ip_address ipAddress, d.port, d.status, d.runtime_data runtimeData, d.last_connect_time lastConnectTime, d.remark
+		from mom_device d
+			left join mom_device_category c on d.category_id = c.category_id
+			left join mom_resource r on d.resource_id = r.resource_id
+		where d.device_id = #{deviceId}
+	</select>
+
+	<select id="countDeviceCode" resultType="int">
+		select count(1) from mom_device where device_code = #{deviceCode}
+		<if test="deviceId != null">and device_id != #{deviceId}</if>
+	</select>
+
+	<insert id="insertDevice" parameterType="map" useGeneratedKeys="true" keyProperty="deviceId">
+		insert into mom_device(device_code, device_name, category_id, resource_id, ip_address, port, status, remark, create_by, create_time)
+		values(#{deviceCode}, #{deviceName}, #{categoryId}, #{resourceId}, #{ipAddress}, #{port}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateDevice" parameterType="map">
+		update mom_device
+		<set>
+			<if test="deviceCode != null and deviceCode != ''">device_code = #{deviceCode},</if>
+			<if test="deviceName != null">device_name = #{deviceName},</if>
+			<if test="categoryId != null">category_id = #{categoryId},</if>
+			<if test="resourceId != null">resource_id = #{resourceId},</if>
+			<if test="ipAddress != null">ip_address = #{ipAddress},</if>
+			<if test="port != null">port = #{port},</if>
+			<if test="status != null">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		</set>
+		where device_id = #{deviceId}
+	</update>
+
+	<update id="updateDeviceRuntime">
+		update mom_device set status = #{status}, runtime_data = #{runtimeData}, last_connect_time = CURRENT_TIMESTAMP,
+			update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP
+		where device_id = #{deviceId}
+	</update>
+
+	<delete id="deleteDeviceByIds" parameterType="Long">
+		delete from mom_device where device_id in
+		<foreach collection="array" item="deviceId" open="(" separator="," close=")">#{deviceId}</foreach>
+	</delete>
+
+	<select id="selectWorkstationTasks" parameterType="map" resultType="map">
+		select s.schedule_id scheduleId, s.schedule_code scheduleCode, s.work_order_id workOrderId, w.work_order_code workOrderCode,
+			p.product_code productCode, p.product_name productName, s.operation_id operationId, o.operation_code operationCode,
+			o.operation_name operationName, s.resource_id resourceId, r.resource_code resourceCode, r.resource_name resourceName,
+			s.plan_start_time planStartTime, s.plan_end_time planEndTime, s.plan_qty planQty, s.reported_qty reportedQty, s.status
+		from mom_schedule s
+			left join mom_work_order w on s.work_order_id = w.work_order_id
+			left join (
+				select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+			) p on w.product_id = p.product_id
+			left join mom_operation o on s.operation_id = o.operation_id
+			left join mom_resource r on s.resource_id = r.resource_id
+		<where>
+			and s.status in ('released', 'running')
+			<if test="resourceId != null and resourceId != ''">and s.resource_id = #{resourceId}</if>
+			<if test="keyword != null and keyword != ''">
+				and (s.schedule_code like concat('%', #{keyword}, '%') or w.work_order_code like concat('%', #{keyword}, '%') or p.product_name like concat('%', #{keyword}, '%'))
+			</if>
+		</where>
+		order by s.plan_start_time, s.schedule_id
+	</select>
+
+	<select id="selectWorkstationTaskById" parameterType="Long" resultType="map">
+		select * from (
+			select s.schedule_id scheduleId, s.schedule_code scheduleCode, s.work_order_id workOrderId, w.work_order_code workOrderCode,
+				p.product_code productCode, p.product_name productName, w.plan_qty workOrderPlanQty, w.completed_qty completedQty,
+				s.operation_id operationId, o.operation_code operationCode, o.operation_name operationName, s.resource_id resourceId,
+				r.resource_code resourceCode, r.resource_name resourceName, s.plan_start_time planStartTime, s.plan_end_time planEndTime,
+				s.plan_qty planQty, s.reported_qty reportedQty, s.status
+			from mom_schedule s
+				left join mom_work_order w on s.work_order_id = w.work_order_id
+				left join (
+					select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+				) p on w.product_id = p.product_id
+				left join mom_operation o on s.operation_id = o.operation_id
+				left join mom_resource r on s.resource_id = r.resource_id
+		) x where x.scheduleId = #{scheduleId}
+	</select>
+
+	<select id="selectTaskOperations" parameterType="Long" resultType="map">
+		select distinct o.operation_id operationId, o.operation_code operationCode, o.operation_name operationName, o.operation_seq operationSeq
+		from mom_schedule s
+			join mom_work_order w on s.work_order_id = w.work_order_id
+			join mom_operation o on w.routing_id = o.routing_id
+		where s.schedule_id = #{scheduleId} and o.status = '0'
+		order by o.operation_seq
+	</select>
+
+	<select id="selectTaskSteps" parameterType="Long" resultType="map">
+		select st.step_id stepId, st.operation_id operationId, st.step_code stepCode, st.step_name stepName, st.step_seq stepSeq,
+			st.standard_minutes standardMinutes, st.is_report_point isReportPoint, st.step_desc stepDesc, st.operation_type operationType,
+			st.screw_check_count screwCheckCount, st.vision_program visionProgram, st.guide_task_id guideTaskId, st.image_url imageUrl
+		from mom_schedule s
+			join mom_work_order w on s.work_order_id = w.work_order_id
+			join mom_operation o on w.routing_id = o.routing_id
+			join mom_work_step st on o.operation_id = st.operation_id
+		where s.schedule_id = #{scheduleId} and o.status = '0' and st.status = '0'
+		order by o.operation_seq, st.step_seq
+	</select>
+
+	<select id="selectTaskDevices" parameterType="Long" resultType="map">
+		select d.device_id deviceId, d.device_code deviceCode, d.device_name deviceName, c.device_type deviceType,
+			d.status, d.runtime_data runtimeData
+		from mom_schedule s
+			join mom_device d on s.resource_id = d.resource_id
+			left join mom_device_category c on d.category_id = c.category_id
+		where s.schedule_id = #{scheduleId}
+		order by d.device_id
+	</select>
+
+	<select id="selectTaskMaterials" parameterType="Long" resultType="map">
+		select i.item_id itemId, i.material_id materialId, m.material_code materialCode, m.material_name materialName,
+			m.spec_model specModel, m.unit, i.quantity, i.issue_type issueType, i.operation_id operationId, i.step_id stepId
+		from mom_schedule s
+			join mom_work_order w on s.work_order_id = w.work_order_id
+			join mom_mbom_item i on w.mbom_id = i.mbom_id
+			left join mom_material m on i.material_id = m.material_id
+		where s.schedule_id = #{scheduleId}
+		order by i.item_seq, i.item_id
+	</select>
+
+	<select id="selectTaskLocations" parameterType="Long" resultType="map">
+		select child.resource_id resourceId, child.resource_code resourceCode, child.resource_name resourceName
+		from mom_schedule s join mom_resource child on child.parent_id = s.resource_id
+		where s.schedule_id = #{scheduleId} and child.resource_type = 'location' and child.status = '0'
+		order by child.resource_code
+	</select>
+
+	<select id="selectMaterialBindings" parameterType="Long" resultType="map">
+		select b.binding_id bindingId, b.schedule_id scheduleId, b.material_id materialId, m.material_code materialCode,
+			m.material_name materialName, b.resource_id resourceId, r.resource_name resourceName, b.box_code boxCode,
+			b.binding_type bindingType, b.quantity, b.status, b.create_time createTime, b.remark
+		from mom_material_binding b
+			left join mom_material m on b.material_id = m.material_id
+			left join mom_resource r on b.resource_id = r.resource_id
+		where b.schedule_id = #{scheduleId}
+		order by b.binding_id desc
+	</select>
+
+	<insert id="insertMaterialBinding" parameterType="map" useGeneratedKeys="true" keyProperty="bindingId">
+		insert into mom_material_binding(schedule_id, material_id, resource_id, box_code, binding_type, quantity, status, remark, create_by, create_time)
+		values(#{scheduleId}, #{materialId}, #{resourceId}, #{boxCode}, #{bindingType}, #{quantity}, 'bound', #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<delete id="deleteMaterialBindingByIds" parameterType="Long">
+		delete from mom_material_binding where binding_id in
+		<foreach collection="array" item="bindingId" open="(" separator="," close=")">#{bindingId}</foreach>
+	</delete>
+
+	<insert id="insertDutyLog" parameterType="map" useGeneratedKeys="true" keyProperty="logId">
+		insert into mom_duty_log(user_name, rfid_card, resource_id, duty_type, status, create_by, create_time, remark)
+		values(#{userName}, #{rfidCard}, #{resourceId}, #{dutyType}, #{status}, #{createBy}, CURRENT_TIMESTAMP, #{remark})
+	</insert>
+
+	<select id="selectDutyLogList" parameterType="map" resultType="map">
+		select l.log_id logId, l.user_name userName, l.rfid_card rfidCard, l.resource_id resourceId, r.resource_name resourceName,
+			l.duty_type dutyType, l.status, l.create_time createTime, l.remark
+		from mom_duty_log l left join mom_resource r on l.resource_id = r.resource_id
+		<where>
+			<if test="userName != null and userName != ''">and l.user_name like concat('%', #{userName}, '%')</if>
+			<if test="resourceId != null and resourceId != ''">and l.resource_id = #{resourceId}</if>
+			<if test="status != null and status != ''">and l.status = #{status}</if>
+		</where>
+		order by l.log_id desc
+	</select>
+
+	<insert id="insertProductionTrace" parameterType="map" useGeneratedKeys="true" keyProperty="traceId">
+		insert into mom_production_trace(work_order_id, schedule_id, operation_id, step_id, resource_id, material_id, device_id, serial_no,
+			trace_type, event_name, operator_name, result, event_data, create_by, create_time, remark)
+		values(#{workOrderId}, #{scheduleId}, #{operationId}, #{stepId}, #{resourceId}, #{materialId}, #{deviceId}, #{serialNo},
+			#{traceType}, #{eventName}, #{operatorName}, #{result}, #{eventData}, #{createBy}, CURRENT_TIMESTAMP, #{remark})
+	</insert>
+
+	<select id="selectProductionTraceList" parameterType="map" resultType="map">
+		select t.trace_id traceId, t.work_order_id workOrderId, w.work_order_code workOrderCode, t.schedule_id scheduleId,
+			t.operation_id operationId, o.operation_name operationName, t.step_id stepId, st.step_name stepName,
+			t.resource_id resourceId, r.resource_name resourceName, t.material_id materialId, m.material_name materialName,
+			t.device_id deviceId, d.device_name deviceName, t.serial_no serialNo, t.trace_type traceType, t.event_name eventName,
+			t.operator_name operatorName, t.result, t.event_data eventData, t.create_time createTime, t.remark
+		from mom_production_trace t
+			left join mom_work_order w on t.work_order_id = w.work_order_id
+			left join mom_operation o on t.operation_id = o.operation_id
+			left join mom_work_step st on t.step_id = st.step_id
+			left join mom_resource r on t.resource_id = r.resource_id
+			left join mom_material m on t.material_id = m.material_id
+			left join mom_device d on t.device_id = d.device_id
+		<where>
+			<if test="workOrderId != null and workOrderId != ''">and t.work_order_id = #{workOrderId}</if>
+			<if test="serialNo != null and serialNo != ''">and t.serial_no like concat('%', #{serialNo}, '%')</if>
+			<if test="traceType != null and traceType != ''">and t.trace_type = #{traceType}</if>
+			<if test="operatorName != null and operatorName != ''">and t.operator_name like concat('%', #{operatorName}, '%')</if>
+		</where>
+		order by t.trace_id desc
+	</select>
+
+	<select id="selectSerialTrace" parameterType="String" resultType="map">
+		select trace_id traceId, serial_no serialNo, trace_type traceType, event_name eventName, operator_name operatorName,
+			result, event_data eventData, create_time createTime, remark
+		from mom_production_trace
+		where serial_no = #{serialNo}
+		order by trace_id
+	</select>
+
+	<select id="selectUserByRfid" parameterType="String" resultType="map">
+		select user_id userId, user_name userName, nick_name nickName, rfid_card rfidCard
+		from sys_user
+		where rfid_card = #{rfidCard} and status = '0' and del_flag = '0'
+	</select>
+</mapper>

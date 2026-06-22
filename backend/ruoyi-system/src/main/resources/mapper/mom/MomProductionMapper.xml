@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.mom.mapper.MomProductionMapper">
+
+	<resultMap type="MomSchedule" id="MomScheduleResult">
+		<id property="scheduleId" column="schedule_id" />
+		<result property="scheduleCode" column="schedule_code" />
+		<result property="workOrderId" column="work_order_id" />
+		<result property="workOrderCode" column="work_order_code" />
+		<result property="productName" column="product_name" />
+		<result property="operationId" column="operation_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="operationName" column="operation_name" />
+		<result property="resourceId" column="resource_id" />
+		<result property="resourceCode" column="resource_code" />
+		<result property="resourceName" column="resource_name" />
+		<result property="planStartTime" column="plan_start_time" />
+		<result property="planEndTime" column="plan_end_time" />
+		<result property="planQty" column="plan_qty" />
+		<result property="reportedQty" column="reported_qty" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomStepReport" id="MomStepReportResult">
+		<id property="reportId" column="report_id" />
+		<result property="workOrderId" column="work_order_id" />
+		<result property="workOrderCode" column="work_order_code" />
+		<result property="productName" column="product_name" />
+		<result property="scheduleId" column="schedule_id" />
+		<result property="operationId" column="operation_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="operationName" column="operation_name" />
+		<result property="stepId" column="step_id" />
+		<result property="stepCode" column="step_code" />
+		<result property="stepName" column="step_name" />
+		<result property="resourceId" column="resource_id" />
+		<result property="resourceName" column="resource_name" />
+		<result property="goodQty" column="good_qty" />
+		<result property="badQty" column="bad_qty" />
+		<result property="reportTime" column="report_time" />
+		<result property="reportUser" column="report_user" />
+		<result property="status" column="status" />
+		<result property="createBy" column="create_by" />
+		<result property="createTime" column="create_time" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateTime" column="update_time" />
+		<result property="remark" column="remark" />
+	</resultMap>
+
+	<resultMap type="MomOperation" id="MomOperationOptionResult">
+		<id property="operationId" column="operation_id" />
+		<result property="routingId" column="routing_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="operationName" column="operation_name" />
+		<result property="operationSeq" column="operation_seq" />
+	</resultMap>
+
+	<resultMap type="MomWorkStep" id="MomStepOptionResult">
+		<id property="stepId" column="step_id" />
+		<result property="operationId" column="operation_id" />
+		<result property="operationCode" column="operation_code" />
+		<result property="stepCode" column="step_code" />
+		<result property="stepName" column="step_name" />
+		<result property="stepSeq" column="step_seq" />
+		<result property="stepDesc" column="step_desc" />
+		<result property="operationType" column="operation_type" />
+		<result property="screwCheckCount" column="screw_check_count" />
+		<result property="visionProgram" column="vision_program" />
+		<result property="guideTaskId" column="guide_task_id" />
+		<result property="imageUrl" column="image_url" />
+	</resultMap>
+
+	<sql id="selectScheduleVo">
+		select s.schedule_id, s.schedule_code, s.work_order_id, w.work_order_code, p.product_name,
+			s.operation_id, o.operation_code, o.operation_name, s.resource_id, r.resource_code, r.resource_name,
+			s.plan_start_time, s.plan_end_time, s.plan_qty, s.reported_qty, s.status,
+			s.create_by, s.create_time, s.update_by, s.update_time, s.remark
+		from mom_schedule s
+			left join mom_work_order w on s.work_order_id = w.work_order_id
+			left join (
+				select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+			) p on w.product_id = p.product_id
+			left join mom_operation o on s.operation_id = o.operation_id
+			left join mom_resource r on s.resource_id = r.resource_id
+	</sql>
+
+	<select id="selectScheduleList" parameterType="MomSchedule" resultMap="MomScheduleResult">
+		<include refid="selectScheduleVo"/>
+		<where>
+			<if test="scheduleCode != null and scheduleCode != ''">and s.schedule_code like concat('%', #{scheduleCode}, '%')</if>
+			<if test="workOrderId != null">and s.work_order_id = #{workOrderId}</if>
+			<if test="operationId != null">and s.operation_id = #{operationId}</if>
+			<if test="resourceId != null">and s.resource_id = #{resourceId}</if>
+			<if test="status != null and status != ''">and s.status = #{status}</if>
+		</where>
+		order by s.plan_start_time desc, s.schedule_id desc
+	</select>
+
+	<select id="selectScheduleById" parameterType="Long" resultMap="MomScheduleResult">
+		<include refid="selectScheduleVo"/> where s.schedule_id = #{scheduleId}
+	</select>
+
+	<select id="countScheduleCode" resultType="int">
+		select count(1) from mom_schedule where schedule_code = #{scheduleCode}
+		<if test="scheduleId != null">and schedule_id != #{scheduleId}</if>
+	</select>
+
+	<select id="countResourceConflict" resultType="int">
+		select count(1) from mom_schedule
+		where resource_id = #{resourceId}
+			and status in ('draft', 'released', 'running')
+			and plan_start_time &lt; #{planEndTime}
+			and plan_end_time &gt; #{planStartTime}
+		<if test="scheduleId != null">and schedule_id != #{scheduleId}</if>
+	</select>
+
+	<insert id="insertSchedule" parameterType="MomSchedule" useGeneratedKeys="true" keyProperty="scheduleId">
+		insert into mom_schedule(schedule_code, work_order_id, operation_id, resource_id, plan_start_time, plan_end_time, plan_qty, reported_qty, status, remark, create_by, create_time)
+		values(#{scheduleCode}, #{workOrderId}, #{operationId}, #{resourceId}, #{planStartTime}, #{planEndTime}, #{planQty}, #{reportedQty}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<update id="updateSchedule" parameterType="MomSchedule">
+		update mom_schedule
+		<set>
+			<if test="scheduleCode != null and scheduleCode != ''">schedule_code = #{scheduleCode},</if>
+			<if test="workOrderId != null">work_order_id = #{workOrderId},</if>
+			<if test="operationId != null">operation_id = #{operationId},</if>
+			<if test="resourceId != null">resource_id = #{resourceId},</if>
+			<if test="planStartTime != null">plan_start_time = #{planStartTime},</if>
+			<if test="planEndTime != null">plan_end_time = #{planEndTime},</if>
+			<if test="planQty != null">plan_qty = #{planQty},</if>
+			<if test="reportedQty != null">reported_qty = #{reportedQty},</if>
+			<if test="status != null and status != ''">status = #{status},</if>
+			<if test="remark != null">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			update_time = CURRENT_TIMESTAMP
+		</set>
+		where schedule_id = #{scheduleId}
+	</update>
+
+	<delete id="deleteScheduleByIds" parameterType="Long">
+		delete from mom_schedule where schedule_id in
+		<foreach collection="array" item="scheduleId" open="(" separator="," close=")">#{scheduleId}</foreach>
+	</delete>
+
+	<update id="updateScheduleStatus">
+		update mom_schedule set status = #{status}, update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP where schedule_id = #{scheduleId}
+	</update>
+
+	<update id="addScheduleReportedQty">
+		update mom_schedule set reported_qty = ifnull(reported_qty, 0) + #{qty}, update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP where schedule_id = #{scheduleId}
+	</update>
+
+	<sql id="selectReportVo">
+		select rep.report_id, rep.work_order_id, w.work_order_code, p.product_name, rep.schedule_id,
+			rep.operation_id, o.operation_code, o.operation_name, rep.step_id, st.step_code, st.step_name,
+			rep.resource_id, r.resource_name, rep.good_qty, rep.bad_qty, rep.report_time, rep.report_user,
+			rep.status, rep.create_by, rep.create_time, rep.update_by, rep.update_time, rep.remark
+		from mom_step_report rep
+			left join mom_work_order w on rep.work_order_id = w.work_order_id
+			left join (
+				select material_id product_id, material_code product_code, material_name product_name from mom_material where (material_type = 'product' or category_id in (select category_id from mom_material_category where category_code = 'FG' or category_name = '成品'))
+			) p on w.product_id = p.product_id
+			left join mom_operation o on rep.operation_id = o.operation_id
+			left join mom_work_step st on rep.step_id = st.step_id
+			left join mom_resource r on rep.resource_id = r.resource_id
+	</sql>
+
+	<select id="selectReportList" parameterType="MomStepReport" resultMap="MomStepReportResult">
+		<include refid="selectReportVo"/>
+		<where>
+			<if test="workOrderId != null">and rep.work_order_id = #{workOrderId}</if>
+			<if test="scheduleId != null">and rep.schedule_id = #{scheduleId}</if>
+			<if test="operationId != null">and rep.operation_id = #{operationId}</if>
+			<if test="stepId != null">and rep.step_id = #{stepId}</if>
+			<if test="resourceId != null">and rep.resource_id = #{resourceId}</if>
+			<if test="status != null and status != ''">and rep.status = #{status}</if>
+		</where>
+		order by rep.report_time desc, rep.report_id desc
+	</select>
+
+	<select id="selectReportById" parameterType="Long" resultMap="MomStepReportResult">
+		<include refid="selectReportVo"/> where rep.report_id = #{reportId}
+	</select>
+
+	<insert id="insertReport" parameterType="MomStepReport" useGeneratedKeys="true" keyProperty="reportId">
+		insert into mom_step_report(work_order_id, schedule_id, operation_id, step_id, resource_id, good_qty, bad_qty, report_time, report_user, status, remark, create_by, create_time)
+		values(#{workOrderId}, #{scheduleId}, #{operationId}, #{stepId}, #{resourceId}, #{goodQty}, #{badQty}, #{reportTime}, #{reportUser}, #{status}, #{remark}, #{createBy}, CURRENT_TIMESTAMP)
+	</insert>
+
+	<delete id="deleteReportByIds" parameterType="Long">
+		delete from mom_step_report where report_id in
+		<foreach collection="array" item="reportId" open="(" separator="," close=")">#{reportId}</foreach>
+	</delete>
+
+	<update id="addWorkOrderCompletedQty">
+		update mom_work_order set completed_qty = ifnull(completed_qty, 0) + #{qty}, update_by = #{updateBy}, update_time = CURRENT_TIMESTAMP where work_order_id = #{workOrderId}
+	</update>
+
+	<select id="selectOperationsByWorkOrderId" parameterType="Long" resultMap="MomOperationOptionResult">
+		select o.operation_id, o.routing_id, o.operation_code, o.operation_name, o.operation_seq
+		from mom_work_order w
+			join mom_operation o on w.routing_id = o.routing_id
+		where w.work_order_id = #{workOrderId} and o.status = '0'
+		order by o.operation_seq
+	</select>
+
+	<select id="selectStepsByWorkOrderId" parameterType="Long" resultMap="MomStepOptionResult">
+		select st.step_id, st.operation_id, o.operation_code, st.step_code, st.step_name, st.step_seq,
+			st.step_desc, st.operation_type, st.screw_check_count, st.vision_program, st.guide_task_id, st.image_url
+		from mom_work_order w
+			join mom_operation o on w.routing_id = o.routing_id
+			join mom_work_step st on o.operation_id = st.operation_id
+		where w.work_order_id = #{workOrderId} and o.status = '0' and st.status = '0'
+		order by o.operation_seq, st.step_seq
+	</select>
+</mapper>
